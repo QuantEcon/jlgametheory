@@ -43,7 +43,7 @@ jobs:
       
       - name: Run tests
         run: |
-          coverage run --source=jlgametheory -m pytest tests
+          coverage run --source=. -m pytest tests
           coverage xml
       
       - name: Upload coverage to Coveralls
