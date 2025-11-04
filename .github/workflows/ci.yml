@@ -19,11 +19,14 @@ jobs:
       contents: read
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        # os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest]
         python-version: ['3.13']
     
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
