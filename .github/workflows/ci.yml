@@ -45,6 +45,18 @@ jobs:
         run: |
           pytest tests --color=yes --cov=jlgametheory --cov-report=lcov --cov-report=term-missing
       
+      - name: Normalize LCOV paths
+        if: runner.os == 'Linux'
+        run: |
+          echo "Before normalization (first SF lines):"
+          grep '^SF:' coverage.lcov | sed -n '1,10p' || true
+          # remove absolute GITHUB_WORKSPACE prefix so paths become repo-relative
+          sed -i "s|SF:$GITHUB_WORKSPACE/||g" coverage.lcov
+          # ensure paths are explicitly relative (optional)
+          sed -i "s|^SF:|SF:./|g" coverage.lcov
+          echo "After normalization (first SF lines):"
+          grep '^SF:' coverage.lcov | sed -n '1,10p' || true
+      
       - name: Upload coverage to Coveralls
         if: runner.os == 'Linux'
         uses: coverallsapp/github-action@v2
