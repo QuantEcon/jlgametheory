@@ -40,7 +40,7 @@ jobs:
     
     - name: Run tests
       run: |
-        pytest --cov=jlgametheory --cov-report=lcov
+        pytest --cov=jlgametheory --cov-report=term-missing
     
     - name: Upload coverage to Coveralls
       if: runner.os == 'Linux'
