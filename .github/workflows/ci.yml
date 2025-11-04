@@ -43,8 +43,7 @@ jobs:
       
       - name: Run tests
         run: |
-          coverage run --source=. -m pytest tests
-          coverage lcov -o coverage.lcov
+          pytest tests --color=yes --cov=jlgametheory --cov-report=lcov --cov-report=term-missing
       
       - name: Upload coverage to Coveralls
         if: runner.os == 'Linux'
