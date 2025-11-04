@@ -44,6 +44,7 @@ testpaths = ["tests"]
 [tool.coverage.run]
 branch = true
 source = ["jlgametheory"]
+relative_files = true
 omit = ["tests/test_*.py"]
 
 [tool.coverage.report]
