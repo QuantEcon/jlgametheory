@@ -32,6 +32,11 @@ dependencies = [
 [project.optional-dependencies]
 # pip install jlgametheory[test]
 test = ["pytest>=7", "pytest-cov>=4"]
+# pip install jlgametheory[docs]
+docs = [
+    "sphinx>=8.0",
+    "sphinx-copybutton",
+]
 
 [project.urls]
 Homepage = "https://github.com/QuantEcon/jlgametheory"
