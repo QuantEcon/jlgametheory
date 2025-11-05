@@ -1,0 +1,6 @@
+﻿lrsnash
+=======
+
+.. currentmodule:: jlgametheory
+
+.. autofunction:: jlgametheory.lrsnash

@@ -1,0 +1,17 @@
+// Ensure autosummary links have no underline in sphinxdoc
+document.addEventListener('DOMContentLoaded', () => {
+  const style = document.createElement('style');
+  style.textContent = `
+    /* Remove all underline-like effects inside autosummary tables */
+    table.autosummary a.reference,
+    table.autosummary a.reference *,
+    table.autosummary code.xref,
+    table.autosummary code.literal {
+      text-decoration: none !important;
+      border-bottom: 0 !important;
+      box-shadow: none !important;
+      background-image: none !important;
+    }
+  `;
+  document.head.appendChild(style);
+});

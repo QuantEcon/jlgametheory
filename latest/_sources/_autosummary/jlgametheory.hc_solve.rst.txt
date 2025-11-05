@@ -1,0 +1,6 @@
+﻿hc_solve
+========
+
+.. currentmodule:: jlgametheory
+
+.. autofunction:: jlgametheory.hc_solve

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>jlgametheory.jlgametheory &#8212; jlgametheory 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=34905f61" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../../_static/autosummary_fixes.js?v=9ec2d9d6"></script>
+    <script src="../../_static/autosummary_no_underline.css?v=eea13142"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">jlgametheory 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">jlgametheory.jlgametheory</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for jlgametheory.jlgametheory</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">GameTheory</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">to_jl_nfg</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+    <span class="n">g_jl</span> <span class="o">=</span> <span class="n">GameTheory</span><span class="o">.</span><span class="n">NormalFormGame</span><span class="p">(</span>
+        <span class="o">*</span><span class="p">(</span><span class="n">GameTheory</span><span class="o">.</span><span class="n">Player</span><span class="p">(</span><span class="n">player</span><span class="o">.</span><span class="n">payoff_array</span><span class="p">)</span> <span class="k">for</span> <span class="n">player</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">players</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">g_jl</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_to_py_ne</span><span class="p">(</span><span class="n">NE_jl</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">NE_jl</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_to_py_nes</span><span class="p">(</span><span class="n">NEs_jl</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">_to_py_ne</span><span class="p">(</span><span class="n">NE</span><span class="p">)</span> <span class="k">for</span> <span class="n">NE</span> <span class="ow">in</span> <span class="n">NEs_jl</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="lrsnash">
+<a class="viewcode-back" href="../../_autosummary/jlgametheory.lrsnash.html#jlgametheory.lrsnash">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">lrsnash</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute in exact arithmetic all extreme mixed-action Nash equilibria</span>
+<span class="sd">    of a 2-player normal form game with integer payoffs. This function</span>
+<span class="sd">    calls the Nash equilibrium computation routine in `lrslib` (through</span>
+<span class="sd">    its Julia wrapper `LRSLib.jl`) which is based on the &quot;lexicographic</span>
+<span class="sd">    reverse search&quot; vertex enumeration algorithm [1]_.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    g : NormalFormGame</span>
+<span class="sd">        2-player NormalFormGame instance with integer payoffs.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    NEs : list(tuple(ndarray(object, ndim=1)))</span>
+<span class="sd">        List containing tuples of Nash equilibrium mixed actions, where</span>
+<span class="sd">        the values are represented by `fractions.Fraction`.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    A degenerate game example:</span>
+
+<span class="sd">    &gt;&gt;&gt; import quantecon.game_theory as gt</span>
+<span class="sd">    &gt;&gt;&gt; import jlgametheory as jgt</span>
+<span class="sd">    &gt;&gt;&gt; from pprint import pprint</span>
+<span class="sd">    &gt;&gt;&gt; bimatrix = [[(3, 3), (3, 3)],</span>
+<span class="sd">    ...             [(2, 2), (5, 6)],</span>
+<span class="sd">    ...             [(0, 3), (6, 1)]]</span>
+<span class="sd">    &gt;&gt;&gt; g = gt.NormalFormGame(bimatrix)</span>
+<span class="sd">    &gt;&gt;&gt; NEs = jgt.lrsnash(g)</span>
+<span class="sd">    &gt;&gt;&gt; pprint(NEs)</span>
+<span class="sd">    [(array([Fraction(1, 1), Fraction(0, 1), Fraction(0, 1)], dtype=object),</span>
+<span class="sd">      array([Fraction(1, 1), Fraction(0, 1)], dtype=object)),</span>
+<span class="sd">     (array([Fraction(1, 1), Fraction(0, 1), Fraction(0, 1)], dtype=object),</span>
+<span class="sd">      array([Fraction(2, 3), Fraction(1, 3)], dtype=object)),</span>
+<span class="sd">     (array([Fraction(0, 1), Fraction(1, 3), Fraction(2, 3)], dtype=object),</span>
+<span class="sd">      array([Fraction(1, 3), Fraction(2, 3)], dtype=object))]</span>
+
+<span class="sd">    The set of Nash equilibria of this degenerate game consists of an</span>
+<span class="sd">    isolated equilibrium, the third output, and a non-singleton</span>
+<span class="sd">    equilibrium component, the extreme points of which are given by the</span>
+<span class="sd">    first two outputs.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] D. Avis, G. Rosenberg, R. Savani, and B. von Stengel,</span>
+<span class="sd">       &quot;Enumeration of Nash Equilibria for Two-Player Games,&quot; Economic</span>
+<span class="sd">       Theory (2010), 9-37.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">N</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;input must be a 2-player NormalFormGame&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">N</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Implemented only for 2-player games&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s1">&#39;Implemented only for games with integer payoffs&#39;</span>
+        <span class="p">)</span>
+
+    <span class="n">NEs_jl</span> <span class="o">=</span> <span class="n">GameTheory</span><span class="o">.</span><span class="n">lrsnash</span><span class="p">(</span><span class="n">to_jl_nfg</span><span class="p">(</span><span class="n">g</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">_to_py_nes</span><span class="p">(</span><span class="n">NEs_jl</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="hc_solve">
+<a class="viewcode-back" href="../../_autosummary/jlgametheory.hc_solve.html#jlgametheory.hc_solve">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">hc_solve</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">ntofind</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">),</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute all isolated mixed-action Nash equilibria of an N-player</span>
+<span class="sd">    normal form game.</span>
+
+<span class="sd">    This function solves a system of polynomial equations arising from</span>
+<span class="sd">    the nonlinear complementarity problem representation of Nash</span>
+<span class="sd">    equilibrium, by using `HomotopyContinuation.jl`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    g : NormalFormGame</span>
+<span class="sd">        N-player NormalFormGame instance.</span>
+
+<span class="sd">    ntofind : scalar, optional(default=float(&#39;inf&#39;))</span>
+<span class="sd">        Number of Nash equilibria to find.</span>
+
+<span class="sd">    options :</span>
+<span class="sd">        Optional keyword arguments to pass to `HomotopyContinuation.solve`.</span>
+<span class="sd">        For example, the option `seed` can set the random seed used</span>
+<span class="sd">        during the computations. See the `documentation</span>
+<span class="sd">        &lt;https://www.juliahomotopycontinuation.org/HomotopyContinuation.jl/stable/solve/&gt;`_</span>
+<span class="sd">        for `HomotopyContinuation.solve` for details.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    NEs : list(tuple(ndarray(float, ndim=1)))</span>
+<span class="sd">        List containing tuples of Nash equilibrium mixed actions.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Consider the 3-player 2-action game with 9 Nash equilibria in</span>
+<span class="sd">    McKelvey and McLennan (1996) &quot;Computation of Equilibria in Finite</span>
+<span class="sd">    Games&quot;:</span>
+
+<span class="sd">    &gt;&gt;&gt; import quantecon.game_theory as gt</span>
+<span class="sd">    &gt;&gt;&gt; import jlgametheory as jgt</span>
+<span class="sd">    &gt;&gt;&gt; from pprint import pprint</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; np.set_printoptions(precision=3)  # Reduce the digits printed</span>
+<span class="sd">    &gt;&gt;&gt; g = gt.NormalFormGame((2, 2, 2))</span>
+<span class="sd">    &gt;&gt;&gt; g[0, 0, 0] = 9, 8, 12</span>
+<span class="sd">    &gt;&gt;&gt; g[1, 1, 0] = 9, 8, 2</span>
+<span class="sd">    &gt;&gt;&gt; g[0, 1, 1] = 3, 4, 6</span>
+<span class="sd">    &gt;&gt;&gt; g[1, 0, 1] = 3, 4, 4</span>
+<span class="sd">    &gt;&gt;&gt; print(g)</span>
+<span class="sd">    3-player NormalFormGame with payoff profile array:</span>
+<span class="sd">    [[[[ 9.,  8., 12.],   [ 0.,  0.,  0.]],</span>
+<span class="sd">      [[ 0.,  0.,  0.],   [ 3.,  4.,  6.]]],</span>
+<span class="sd">    &lt;BLANKLINE&gt;</span>
+<span class="sd">     [[[ 0.,  0.,  0.],   [ 3.,  4.,  4.]],</span>
+<span class="sd">      [[ 9.,  8.,  2.],   [ 0.,  0.,  0.]]]]</span>
+<span class="sd">    &gt;&gt;&gt; NEs = jgt.hc_solve(g, show_progress=False)</span>
+<span class="sd">    &gt;&gt;&gt; len(NEs)</span>
+<span class="sd">    9</span>
+<span class="sd">    &gt;&gt;&gt; pprint(NEs)</span>
+<span class="sd">    [(array([0., 1.]), array([0., 1.]), array([1., 0.])),</span>
+<span class="sd">     (array([0.5, 0.5]), array([0.5, 0.5]), array([1.000e+00, 2.351e-38])),</span>
+<span class="sd">     (array([1., 0.]), array([0., 1.]), array([-1.881e-37,  1.000e+00])),</span>
+<span class="sd">     (array([0.25, 0.75]), array([0.5, 0.5]), array([0.333, 0.667])),</span>
+<span class="sd">     (array([0.25, 0.75]), array([1.000e+00, 1.345e-43]), array([0.25, 0.75])),</span>
+<span class="sd">     (array([0., 1.]), array([0.333, 0.667]), array([0.333, 0.667])),</span>
+<span class="sd">     (array([1., 0.]), array([ 1.00e+00, -5.74e-42]), array([1., 0.])),</span>
+<span class="sd">     (array([0., 1.]), array([1., 0.]), array([2.374e-66, 1.000e+00])),</span>
+<span class="sd">     (array([0.5, 0.5]), array([0.333, 0.667]), array([0.25, 0.75]))]</span>
+<span class="sd">    &gt;&gt;&gt; all(g.is_nash(NE) for NE in NEs)</span>
+<span class="sd">    True</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">N</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;g must be a NormalFormGame&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">N</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Not implemented for 1-player games&#39;</span><span class="p">)</span>
+
+    <span class="n">NEs_jl</span> <span class="o">=</span> <span class="n">GameTheory</span><span class="o">.</span><span class="n">hc_solve</span><span class="p">(</span><span class="n">to_jl_nfg</span><span class="p">(</span><span class="n">g</span><span class="p">),</span> <span class="n">ntofind</span><span class="o">=</span><span class="n">ntofind</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_to_py_nes</span><span class="p">(</span><span class="n">NEs_jl</span><span class="p">)</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">jlgametheory 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">jlgametheory.jlgametheory</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright .
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>jlgametheory — Documentation &#8212; jlgametheory 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css?v=34905f61" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <script src="_static/documentation_options.js?v=01f34227"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=ccdb6887"></script>
+    <script src="_static/autosummary_fixes.js?v=9ec2d9d6"></script>
+    <script src="_static/autosummary_no_underline.css?v=eea13142"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="lrsnash" href="_autosummary/jlgametheory.lrsnash.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="_autosummary/jlgametheory.lrsnash.html" title="lrsnash"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">jlgametheory 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">jlgametheory — Documentation</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="jlgametheory-documentation">
+<h1>jlgametheory — Documentation<a class="headerlink" href="#jlgametheory-documentation" title="Link to this heading">¶</a></h1>
+<p><a class="reference external" href="https://github.com/QuantEcon/jlgametheory">jlgametheory</a> is a Python interface to
+<a class="reference external" href="https://github.com/QuantEcon/GameTheory.jl">GameTheory.jl</a>.</p>
+<p>It allows passing a <code class="code docutils literal notranslate"><span class="pre">NormalFormGame</span></code> instance from
+<a class="reference external" href="https://quanteconpy.readthedocs.io/en/stable/game_theory.html">quantecon.game_theory</a>
+to GameTheory.jl functions via
+<a class="reference external" href="https://juliapy.github.io/PythonCall.jl/stable/juliacall/">juliacall</a>.</p>
+<ul class="simple">
+<li><p>For constructing <code class="code docutils literal notranslate"><span class="pre">NormalFormGame</span></code>,
+see its <a class="reference external" href="https://quanteconpy.readthedocs.io/en/stable/game_theory/normal_form_game.html">documentation</a>.</p></li>
+</ul>
+<section id="implemented-functions">
+<h2>Implemented functions<a class="headerlink" href="#implemented-functions" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/jlgametheory.lrsnash.html#jlgametheory.lrsnash" title="jlgametheory.lrsnash"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lrsnash</span></code></a></p></td>
+<td><p>Compute in exact arithmetic all extreme mixed-action Nash equilibria of a 2-player normal form game with integer payoffs.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/jlgametheory.hc_solve.html#jlgametheory.hc_solve" title="jlgametheory.hc_solve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hc_solve</span></code></a></p></td>
+<td><p>Compute all isolated mixed-action Nash equilibria of an N-player normal form game.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="#">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">jlgametheory — Documentation</a><ul>
+<li><a class="reference internal" href="#implemented-functions">Implemented functions</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="_autosummary/jlgametheory.lrsnash.html"
+                          title="next chapter">lrsnash</a></p>
+  </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="_autosummary/jlgametheory.lrsnash.html" title="lrsnash"
+             >next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">jlgametheory 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">jlgametheory — Documentation</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright .
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>
