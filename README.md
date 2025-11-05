@@ -1,5 +1,8 @@
 # jlgametheory
 
+[![Build Status](https://github.com/QuantEcon/jlgametheory/actions/workflows/ci.yml/badge.svg)](https://github.com/QuantEcon/jlgametheory/actions/workflows/ci.yml)
+[![Coverage Status](https://coveralls.io/repos/QuantEcon/jlgametheory/badge.svg)](https://coveralls.io/github/QuantEcon/jlgametheory)
+
 Python interface to GameTheory.jl
 
 `jlgametheory` is a Python package that allows passing
