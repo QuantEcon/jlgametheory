@@ -2,6 +2,7 @@
 
 [![Build Status](https://github.com/QuantEcon/jlgametheory/actions/workflows/ci.yml/badge.svg)](https://github.com/QuantEcon/jlgametheory/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/QuantEcon/jlgametheory/badge.svg)](https://coveralls.io/github/QuantEcon/jlgametheory)
+[![Documentation (stable)](https://img.shields.io/badge/docs-stable-blue.svg)](https://quantecon.github.io/jlgametheory/stable/)
 [![Documentation (latest)](https://img.shields.io/badge/docs-latest-blue.svg)](https://quantecon.github.io/jlgametheory/latest/)
 
 Python interface to GameTheory.jl
@@ -12,11 +13,17 @@ a `NormalFormGame` instance from
 [`GameTheory.jl`](https://github.com/QuantEcon/GameTheory.jl) functions
 via [`JuliaCall`](https://github.com/JuliaPy/PythonCall.jl).
 
+## Installation
+
+```
+pip install jlgametheory
+```
+
 ## Implemented functions
 
-* [`lrsnash`](https://quantecon.github.io/jlgametheory/latest/_autosummary/jlgametheory.lrsnash.html):
+* [`lrsnash`](https://quantecon.github.io/jlgametheory/stable/_autosummary/jlgametheory.lrsnash.html):
   Compute in exact arithmetic all extreme mixed-action Nash equilibria of a 2-player normal form game with integer payoffs.
-* [`hc_solve`](https://quantecon.github.io/jlgametheory/latest/_autosummary/jlgametheory.hc_solve.html):
+* [`hc_solve`](https://quantecon.github.io/jlgametheory/stable/_autosummary/jlgametheory.hc_solve.html):
   Compute all isolated mixed-action Nash equilibria of an N-player normal form game.
 
 ## Example usage
