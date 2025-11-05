@@ -14,7 +14,7 @@ permissions:
 # Allow one concurrent deployment
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build-and-deploy:
@@ -55,6 +55,8 @@ jobs:
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_branch: gh-pages
+        force_orphan: true
         publish_dir: ./docs/_build/html
         destination_dir: ${{ steps.version.outputs.version }}
         keep_files: true
@@ -86,6 +88,8 @@ jobs:
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_branch: gh-pages
+        force_orphan: true
         publish_dir: ./_redirect
         keep_files: true
         user_name: 'github-actions[bot]'
