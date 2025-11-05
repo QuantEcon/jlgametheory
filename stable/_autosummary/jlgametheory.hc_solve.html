@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>hc_solve &#8212; jlgametheory 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=34905f61" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <script src="../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=ccdb6887"></script>
+    <script src="../_static/autosummary_fixes.js?v=9ec2d9d6"></script>
+    <script src="../_static/autosummary_no_underline.css?v=eea13142"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="lrsnash" href="jlgametheory.lrsnash.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="jlgametheory.lrsnash.html" title="lrsnash"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">jlgametheory 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">hc_solve</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="hc-solve">
+<h1>hc_solve<a class="headerlink" href="#hc-solve" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="jlgametheory.hc_solve">
+<span class="sig-name descname"><span class="pre">hc_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ntofind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">inf</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jlgametheory/jlgametheory.html#hc_solve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlgametheory.hc_solve" title="Link to this definition">¶</a></dt>
+<dd><p>Compute all isolated mixed-action Nash equilibria of an N-player
+normal form game.</p>
+<p>This function solves a system of polynomial equations arising from
+the nonlinear complementarity problem representation of Nash
+equilibrium, by using <code class="code docutils literal notranslate"><span class="pre">HomotopyContinuation.jl</span></code>.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>g<span class="classifier">NormalFormGame</span></dt><dd><p>N-player NormalFormGame instance.</p>
+</dd>
+<dt>ntofind<span class="classifier">scalar, optional(default=float(‘inf’))</span></dt><dd><p>Number of Nash equilibria to find.</p>
+</dd>
+<dt>options :</dt><dd><p>Optional keyword arguments to pass to <code class="code docutils literal notranslate"><span class="pre">HomotopyContinuation.solve</span></code>.
+For example, the option <code class="code docutils literal notranslate"><span class="pre">seed</span></code> can set the random seed used
+during the computations. See the <a class="reference external" href="https://www.juliahomotopycontinuation.org/HomotopyContinuation.jl/stable/solve/">documentation</a>
+for <code class="code docutils literal notranslate"><span class="pre">HomotopyContinuation.solve</span></code> for details.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>NEs<span class="classifier">list(tuple(ndarray(float, ndim=1)))</span></dt><dd><p>List containing tuples of Nash equilibrium mixed actions.</p>
+</dd>
+</dl>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h2>
+<p>Consider the 3-player 2-action game with 9 Nash equilibria in
+McKelvey and McLennan (1996) “Computation of Equilibria in Finite
+Games”:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">quantecon.game_theory</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">jlgametheory</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jgt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pprint</span><span class="w"> </span><span class="kn">import</span> <span class="n">pprint</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># Reduce the digits printed</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">NormalFormGame</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">12</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+<span class="go">3-player NormalFormGame with payoff profile array:</span>
+<span class="go">[[[[ 9.,  8., 12.],   [ 0.,  0.,  0.]],</span>
+<span class="go">  [[ 0.,  0.,  0.],   [ 3.,  4.,  6.]]],</span>
+
+<span class="go"> [[[ 0.,  0.,  0.],   [ 3.,  4.,  4.]],</span>
+<span class="go">  [[ 9.,  8.,  2.],   [ 0.,  0.,  0.]]]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NEs</span> <span class="o">=</span> <span class="n">jgt</span><span class="o">.</span><span class="n">hc_solve</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">show_progress</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">NEs</span><span class="p">)</span>
+<span class="go">9</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pprint</span><span class="p">(</span><span class="n">NEs</span><span class="p">)</span>
+<span class="go">[(array([0., 1.]), array([0., 1.]), array([1., 0.])),</span>
+<span class="go"> (array([0.5, 0.5]), array([0.5, 0.5]), array([1.000e+00, 2.351e-38])),</span>
+<span class="go"> (array([1., 0.]), array([0., 1.]), array([-1.881e-37,  1.000e+00])),</span>
+<span class="go"> (array([0.25, 0.75]), array([0.5, 0.5]), array([0.333, 0.667])),</span>
+<span class="go"> (array([0.25, 0.75]), array([1.000e+00, 1.345e-43]), array([0.25, 0.75])),</span>
+<span class="go"> (array([0., 1.]), array([0.333, 0.667]), array([0.333, 0.667])),</span>
+<span class="go"> (array([1., 0.]), array([ 1.00e+00, -5.74e-42]), array([1., 0.])),</span>
+<span class="go"> (array([0., 1.]), array([1., 0.]), array([2.374e-66, 1.000e+00])),</span>
+<span class="go"> (array([0.5, 0.5]), array([0.333, 0.667]), array([0.25, 0.75]))]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">all</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">is_nash</span><span class="p">(</span><span class="n">NE</span><span class="p">)</span> <span class="k">for</span> <span class="n">NE</span> <span class="ow">in</span> <span class="n">NEs</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</section>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">hc_solve</a><ul>
+<li><a class="reference internal" href="#jlgametheory.hc_solve"><code class="docutils literal notranslate"><span class="pre">hc_solve</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="jlgametheory.lrsnash.html"
+                          title="previous chapter">lrsnash</a></p>
+  </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="jlgametheory.lrsnash.html" title="lrsnash"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">jlgametheory 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">hc_solve</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright .
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>
