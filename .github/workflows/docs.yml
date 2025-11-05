@@ -1,0 +1,97 @@
+name: Documentation
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v5
+    
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.13'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[docs]"
+    
+    - name: Determine version path
+      id: version
+      run: |
+        if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+          VERSION="stable"
+          echo "Building docs for tag: ${{ github.ref_name }}"
+        else
+          VERSION="latest"
+          echo "Building docs for main branch"
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+    
+    - name: Build documentation
+      run: |
+        cd docs
+        sphinx-build -b html . _build/html
+    
+    - name: Deploy documentation
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_branch: gh-pages
+        force_orphan: true
+        publish_dir: ./docs/_build/html
+        destination_dir: ${{ steps.version.outputs.version }}
+        keep_files: true
+        user_name: 'github-actions[bot]'
+        user_email: 'github-actions[bot]@users.noreply.github.com'
+        commit_message: 'Deploy ${{ steps.version.outputs.version }} docs from ${{ github.sha }}'
+    
+    - name: Deploy redirect page
+      if: steps.version.outputs.version == 'stable'
+      run: |
+        mkdir -p _redirect
+        cat > _redirect/index.html << 'EOF'
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <title>Redirecting to stable documentation</title>
+            <meta http-equiv="refresh" content="0; URL=stable/">
+            <link rel="canonical" href="stable/">
+          </head>
+          <body>
+            <p>If you are not redirected automatically, follow this <a href="stable/">link to the stable documentation</a>.</p>
+          </body>
+        </html>
+        EOF
+    
+    - name: Update redirect
+      if: steps.version.outputs.version == 'stable'
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_branch: gh-pages
+        force_orphan: true
+        publish_dir: ./_redirect
+        keep_files: true
+        user_name: 'github-actions[bot]'
+        user_email: 'github-actions[bot]@users.noreply.github.com'
+        commit_message: 'Update root redirect'

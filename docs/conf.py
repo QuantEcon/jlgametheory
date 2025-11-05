@@ -9,6 +9,7 @@ extensions = [
     "sphinx_copybutton",
 ]
 autosummary_generate = True
+autodoc_mock_imports = ["juliacall"]
 add_module_names = False
 html_theme = "sphinxdoc"
 
