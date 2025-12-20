@@ -4,6 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/QuantEcon/jlgametheory/badge.svg)](https://coveralls.io/github/QuantEcon/jlgametheory)
 [![Documentation (stable)](https://img.shields.io/badge/docs-stable-blue.svg)](https://quantecon.github.io/jlgametheory/stable/)
 [![Documentation (latest)](https://img.shields.io/badge/docs-latest-blue.svg)](https://quantecon.github.io/jlgametheory/latest/)
+[![PyPI - Version](https://img.shields.io/pypi/v/jlgametheory)](https://pypi.org/project/jlgametheory/)
 
 Python interface to GameTheory.jl
 
