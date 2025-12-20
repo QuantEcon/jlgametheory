@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "jlgametheory"
-version = "0.1.0"
+version = "0.1.1"
 description = "Python interface to GameTheory.jl"
 readme = "README.md"
 license = {file = "LICENSE"}
