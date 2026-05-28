@@ -5,6 +5,7 @@
 [![Documentation (stable)](https://img.shields.io/badge/docs-stable-blue.svg)](https://quantecon.github.io/jlgametheory/stable/)
 [![Documentation (latest)](https://img.shields.io/badge/docs-latest-blue.svg)](https://quantecon.github.io/jlgametheory/latest/)
 [![PyPI - Version](https://img.shields.io/pypi/v/jlgametheory)](https://pypi.org/project/jlgametheory/)
+[![Conda Version](https://img.shields.io/conda/vn/conda-forge/jlgametheory)](https://anaconda.org/conda-forge/jlgametheory)
 
 Python interface to GameTheory.jl
 
@@ -18,6 +19,10 @@ via [`JuliaCall`](https://github.com/JuliaPy/PythonCall.jl).
 
 ```
 pip install jlgametheory
+```
+or
+```
+conda install -c conda-forge jlgametheory
 ```
 
 ## Implemented functions
