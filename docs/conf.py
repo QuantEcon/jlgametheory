@@ -22,7 +22,8 @@ default_role = "code"
 html_show_sourcelink = False
 
 html_static_path = ["_static"]
-html_js_files = ["autosummary_fixes.js", "autosummary_no_underline.css"]
+html_js_files = ["autosummary_fixes.js"]
+html_css_files = ["custom.css"]
 
 copybutton_prompt_text = r">>> |\.\.\. "
 copybutton_prompt_is_regexp = True

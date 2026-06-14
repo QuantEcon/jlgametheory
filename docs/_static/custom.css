@@ -1,0 +1,10 @@
+/* Remove all underline-like effects inside autosummary tables (sphinxdoc theme) */
+table.autosummary a.reference,
+table.autosummary a.reference *,
+table.autosummary code.xref,
+table.autosummary code.literal {
+    text-decoration: none !important;
+    border-bottom: 0 !important;
+    box-shadow: none !important;
+    background-image: none !important;
+}
