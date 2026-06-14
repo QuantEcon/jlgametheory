@@ -88,6 +88,28 @@ jobs:
         conda info
         conda list
 
+    - name: Run diagnostics and tests
+      env:
+        PYTHONFAULTHANDLER: "1"
+        PYTHONUNBUFFERED: "1"
+      run: |
+        set -euxo pipefail
+
+        which python
+        python -VV
+        python -c "import sys; print(sys.executable); print(sys.path)"
+
+        python -c "import numpy; print('numpy ok', numpy.__version__)"
+        python -c "import quantecon; print('quantecon ok', quantecon.__version__)"
+        python -c "import pytest; print('pytest ok', pytest.__version__)"
+
+        python -c "import juliapkg; print('juliapkg ok')"
+        python -c "from juliacall import Main as jl; print('juliacall ok'); print(jl.seval('VERSION'))"
+
+        python -c "import jlgametheory; print('jlgametheory import ok')"
+
+        python -m pytest -vv -s --tb=long -ra
+
     - name: Run tests
       run: |
         python -m pytest
