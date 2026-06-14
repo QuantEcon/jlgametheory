@@ -27,8 +27,8 @@ html_css_files = ["custom.css"]
 copybutton_prompt_text = r">>> |\.\.\. "
 copybutton_prompt_is_regexp = True
 
+from importlib.metadata import PackageNotFoundError, version as _version
 try:
-    import jlgametheory as _pkg
-    version = release = getattr(_pkg, "__version__", "")
-except Exception:
+    version = release = _version("jlgametheory")
+except PackageNotFoundError:
     version = release = ""
