@@ -49,3 +49,53 @@ jobs:
       uses: coverallsapp/github-action@v2
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  conda-test:
+    name: conda (${{ matrix.os }}, py${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: bash -el {0}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ['3.14']
+
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Set up conda
+      uses: conda-incubator/setup-miniconda@v4
+      with:
+        miniforge-version: latest
+        activate-environment: jlgametheory
+        python-version: ${{ matrix.python-version }}
+        channels: conda-forge
+        channel-priority: strict
+        conda-remove-defaults: "true"
+        add-pip-as-python-dependency: false
+        auto-update-conda: true
+
+    - name: Set up Julia
+      uses: julia-actions/setup-julia@v3
+      with:
+        version: "1"
+
+    - name: Cache Julia
+      uses: julia-actions/cache@v3
+
+    - name: Install dependencies with conda
+      run: |
+        conda install -y numpy quantecon pyjuliacall pytest
+
+    - name: Show installed dependencies
+      run: |
+        conda info
+        conda list
+
+    - name: Run tests
+      run: |
+        python -m pytest
