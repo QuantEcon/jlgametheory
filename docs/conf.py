@@ -1,7 +1,10 @@
-import os, sys
+import os
+import sys
 sys.path.insert(0, os.path.abspath('..'))
 
 project = "jlgametheory"
+copyright = "2025, QuantEcon"
+author = "QuantEcon"
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
