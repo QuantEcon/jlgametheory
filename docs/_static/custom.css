@@ -8,3 +8,12 @@ table.autosummary code.literal {
     box-shadow: none !important;
     background-image: none !important;
 }
+
+/* Render the module prefix in function signatures like the rest of the name.
+   By default .sig-name is bold and 1.1em, while .sig-prename is neither, which
+   would make the "jlgametheory." prefix lighter and smaller than the function
+   name. */
+dl.py > dt .sig-prename.descclassname {
+    font-weight: bold;
+    font-size: 1.1em;
+}
