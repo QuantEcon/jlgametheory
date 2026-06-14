@@ -79,14 +79,6 @@ jobs:
         add-pip-as-python-dependency: false
         auto-update-conda: true
 
-    - name: Set up Julia
-      uses: julia-actions/setup-julia@v3
-      with:
-        version: "1"
-
-    - name: Cache Julia
-      uses: julia-actions/cache@v3
-
     - name: Install dependencies with conda
       run: |
         conda install -y numpy quantecon pyjuliacall pytest
