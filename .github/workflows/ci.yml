@@ -88,27 +88,37 @@ jobs:
         conda info
         conda list
 
-    - name: Run diagnostics and tests
-      env:
-        PYTHONFAULTHANDLER: "1"
-        PYTHONUNBUFFERED: "1"
+    - name: Pin existing Julia executable for JuliaPkg
       run: |
         set -euxo pipefail
 
-        which python
-        python -VV
-        python -c "import sys; print(sys.executable); print(sys.path)"
+        command -v julia
+        julia --version
 
-        python -c "import numpy; print('numpy ok', numpy.__version__)"
-        python -c "import quantecon; print('quantecon ok', quantecon.__version__)"
-        python -c "import pytest; print('pytest ok', pytest.__version__)"
+        python - <<'PY'
+        import os
+        import pathlib
+        import shutil
+        import subprocess
 
-        python -c "import juliapkg; print('juliapkg ok')"
-        python -c "from juliacall import Main as jl; print('juliacall ok'); print(jl.seval('VERSION'))"
+        exe = shutil.which("julia")
+        if exe is None:
+            raise SystemExit("No julia executable found on PATH")
 
-        python -c "import jlgametheory; print('jlgametheory import ok')"
+        resolved = pathlib.Path(exe).resolve()
 
-        python -m pytest -vv -s --tb=long -ra
+        print(f"julia on PATH: {exe}")
+        print(f"resolved julia: {resolved}")
+
+        subprocess.run([str(resolved), "--version"], check=True)
+
+        with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as f:
+            f.write(f"PYTHON_JULIAPKG_EXE={resolved}\n")
+        PY
+
+    - name: Initialize JuliaCall
+      run: |
+        python -c "from juliacall import Main as jl; print(jl.seval('VERSION'))"
 
     - name: Run tests
       run: |
