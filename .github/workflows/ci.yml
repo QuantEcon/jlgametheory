@@ -79,6 +79,14 @@ jobs:
         add-pip-as-python-dependency: false
         auto-update-conda: true
 
+    - name: Set up Julia
+      uses: julia-actions/setup-julia@v3
+      with:
+        version: "1"
+
+    - name: "Cache Julia"
+      uses: julia-actions/cache@v3
+
     - name: Install dependencies with conda
       run: |
         conda install -y numpy quantecon pyjuliacall pytest
@@ -88,38 +96,6 @@ jobs:
         conda info
         conda list
 
-    - name: Pin existing Julia executable for JuliaPkg
-      run: |
-        set -euxo pipefail
-
-        command -v julia
-        julia --version
-
-        python - <<'PY'
-        import os
-        import pathlib
-        import shutil
-        import subprocess
-
-        exe = shutil.which("julia")
-        if exe is None:
-            raise SystemExit("No julia executable found on PATH")
-
-        resolved = pathlib.Path(exe).resolve()
-
-        print(f"julia on PATH: {exe}")
-        print(f"resolved julia: {resolved}")
-
-        subprocess.run([str(resolved), "--version"], check=True)
-
-        with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as f:
-            f.write(f"PYTHON_JULIAPKG_EXE={resolved}\n")
-        PY
-
-    - name: Initialize JuliaCall
-      run: |
-        python -c "from juliacall import Main as jl; print(jl.seval('VERSION'))"
-
     - name: Run tests
       run: |
-        python -m pytest
+        pytest -s
