@@ -34,3 +34,26 @@ try:
     version = release = _version("jlgametheory")
 except PackageNotFoundError:
     version = release = ""
+
+
+def _strip_autosummary_anchors(app, doctree, docname):
+    """Point autosummary table links at the page, not the object's anchor.
+
+    Sphinx links each autosummary entry to the object's anchor
+    (e.g. ``_autosummary/jlgametheory.lrsnash.html#jlgametheory.lrsnash``);
+    drop the ``#fragment`` so the link targets the page itself.
+    """
+    from docutils import nodes
+
+    for table in doctree.findall(nodes.table):
+        if "autosummary" not in table.get("classes", []):
+            continue
+        for ref in table.findall(nodes.reference):
+            uri = ref.get("refuri")
+            if uri and "#" in uri:
+                ref["refuri"] = uri.split("#", 1)[0]
+
+
+def setup(app):
+    app.connect("doctree-resolved", _strip_autosummary_anchors)
+    return {"parallel_read_safe": True, "parallel_write_safe": True}
