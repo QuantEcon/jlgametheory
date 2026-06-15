@@ -58,7 +58,10 @@ jobs:
         publish_branch: gh-pages
         publish_dir: ./docs/_build/html
         destination_dir: ${{ steps.version.outputs.version }}
-        keep_files: true
+        # keep_files is scoped to destination_dir, so a clean publish removes
+        # stale pages (e.g. for renamed/removed functions) from this version's
+        # directory while leaving the other version and the root redirect intact.
+        keep_files: false
         user_name: 'github-actions[bot]'
         user_email: 'github-actions[bot]@users.noreply.github.com'
         commit_message: 'Deploy ${{ steps.version.outputs.version }} docs from ${{ github.sha }}'
@@ -89,6 +92,9 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_branch: gh-pages
         publish_dir: ./_redirect
+        # This deploys to the branch root (no destination_dir), so keep_files
+        # MUST stay true — a clean publish here would delete the latest/ and
+        # stable/ directories.
         keep_files: true
         user_name: 'github-actions[bot]'
         user_email: 'github-actions[bot]@users.noreply.github.com'
