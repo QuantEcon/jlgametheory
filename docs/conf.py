@@ -56,3 +56,4 @@ def _strip_autosummary_anchors(app, doctree, docname):
 
 def setup(app):
     app.connect("doctree-resolved", _strip_autosummary_anchors)
+    return {"parallel_read_safe": True, "parallel_write_safe": True}
