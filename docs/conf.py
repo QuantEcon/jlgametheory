@@ -1,9 +1,11 @@
 import os
 import sys
+from datetime import datetime
 sys.path.insert(0, os.path.abspath('..'))
 
 project = "jlgametheory"
-copyright = "2025, QuantEcon"
+year = datetime.now().year
+copyright = f"2025-{year}, QuantEcon"
 author = "QuantEcon"
 extensions = [
     "sphinx.ext.autodoc",
