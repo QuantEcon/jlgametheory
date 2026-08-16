@@ -28,6 +28,33 @@ html_show_sourcelink = False
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
 
+# Documentation channel ("stable" or "latest") for the channel switcher
+# in the navigation bar, set by the docs deployment workflow. Empty for
+# local builds, where both channels render as links.
+docs_channel = os.environ.get("JLGAMETHEORY_DOCS_CHANNEL", "")
+docs_base_url = "https://quantecon.github.io/jlgametheory"
+
+html_context = {
+    "docs_channel": docs_channel,
+    "docs_channels": [
+        {
+            "name": "stable",
+            "label": "stable",
+            "description": "Stable release documentation",
+            "base_url": f"{docs_base_url}/stable/",
+        },
+        {
+            "name": "latest",
+            "label": "latest",
+            "description": "Latest development documentation",
+            "base_url": f"{docs_base_url}/latest/",
+        },
+    ],
+}
+
+# Canonical URL, pointing at the stable channel from both channels
+html_baseurl = f"{docs_base_url}/stable/"
+
 copybutton_prompt_text = r">>> |\.\.\. "
 copybutton_prompt_is_regexp = True
 
@@ -36,6 +63,25 @@ try:
     version = release = _version("jlgametheory")
 except PackageNotFoundError:
     version = release = ""
+
+
+def _strip_genindex_module_annotation(app, pagename, templatename, context,
+                                      doctree):
+    """Drop the " (in module ...)" annotation from general index entries
+    (e.g. show ``lrsnash()`` instead of ``lrsnash() (in module
+    jlgametheory)``).
+    """
+    if pagename != "genindex":
+        return
+    import re
+
+    def strip(name):
+        return re.sub(r"\s*\(in module .*?\)", "", name)
+
+    context["genindexentries"] = [
+        (letter, [(strip(name), rest) for name, rest in entries])
+        for letter, entries in context["genindexentries"]
+    ]
 
 
 def _strip_autosummary_anchors(app, doctree, docname):
@@ -57,5 +103,6 @@ def _strip_autosummary_anchors(app, doctree, docname):
 
 
 def setup(app):
+    app.connect("html-page-context", _strip_genindex_module_annotation)
     app.connect("doctree-resolved", _strip_autosummary_anchors)
     return {"parallel_read_safe": True, "parallel_write_safe": True}
