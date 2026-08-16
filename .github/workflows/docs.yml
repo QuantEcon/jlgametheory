@@ -50,10 +50,12 @@ jobs:
     permissions:
       contents: write
 
-    # Allow one concurrent deployment
+    # Serialize deployments: queue instead of cancelling, so that
+    # simultaneous pushes (e.g. a release commit to main plus its tag)
+    # both get deployed rather than one cancelling the other.
     concurrency:
       group: "pages"
-      cancel-in-progress: true
+      cancel-in-progress: false
 
     steps:
     - name: Checkout repository
