@@ -23,3 +23,5 @@ Implemented functions
 
    ~jlgametheory.lrsnash
    ~jlgametheory.hc_solve
+   ~jlgametheory.ipa_solve
+   ~jlgametheory.gnm_solve
