@@ -28,15 +28,17 @@ conda install -c conda-forge jlgametheory
 ## Implemented functions
 
 * [`lrsnash`](https://quantecon.github.io/jlgametheory/stable/_autosummary/jlgametheory.lrsnash.html):
-  Compute in exact arithmetic all extreme mixed-action Nash equilibria of a 2-player normal form game with integer payoffs.
+  Compute in exact arithmetic all extreme mixed-action Nash equilibria of a 2-player normal form game with integer payoffs,
+  with the lexicographic reverse search vertex enumeration algorithm.
 * [`hc_solve`](https://quantecon.github.io/jlgametheory/stable/_autosummary/jlgametheory.hc_solve.html):
-  Compute all isolated mixed-action Nash equilibria of an N-player normal form game.
+  Compute all isolated mixed-action Nash equilibria of an N-player normal form game
+  with the polynomial homotopy continuation method.
 * [`ipa_solve`](https://quantecon.github.io/jlgametheory/stable/_autosummary/jlgametheory.ipa_solve.html):
   Compute one mixed-action approximate Nash equilibrium of an N-player normal form game
-  by the iterated polymatrix approximation (IPA) algorithm.
+  with the iterated polymatrix approximation (IPA) algorithm.
 * [`gnm_solve`](https://quantecon.github.io/jlgametheory/stable/_autosummary/jlgametheory.gnm_solve.html):
   Compute mixed-action Nash equilibria of an N-player normal form game
-  by the global Newton method (GNM) algorithm.
+  with the global Newton method (GNM) algorithm.
 
 ## Example usage
 

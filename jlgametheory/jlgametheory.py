@@ -21,10 +21,12 @@ def _to_py_nes(NEs_jl):
 def lrsnash(g):
     """
     Compute in exact arithmetic all extreme mixed-action Nash equilibria
-    of a 2-player normal form game with integer payoffs. This function
-    calls the Nash equilibrium computation routine in `lrslib` (through
-    its Julia wrapper `LRSLib.jl`) which is based on the "lexicographic
-    reverse search" vertex enumeration algorithm [1]_.
+    of a 2-player normal form game with integer payoffs, with the
+    lexicographic reverse search vertex enumeration algorithm.
+
+    This function calls the Nash equilibrium computation routine of
+    Avis, Rosenberg, Savani, and von Stengel [1]_ implemented in
+    `lrslib` (through its Julia wrapper `LRSLib.jl`).
 
     Parameters
     ----------
@@ -87,7 +89,7 @@ def lrsnash(g):
 def hc_solve(g, ntofind=float('inf'), **options):
     """
     Compute all isolated mixed-action Nash equilibria of an N-player
-    normal form game.
+    normal form game with the polynomial homotopy continuation method.
 
     This function solves a system of polynomial equations arising from
     the nonlinear complementarity problem representation of Nash
