@@ -1,0 +1,27 @@
+{% extends "!layout.html" %}
+
+{#- Top navigation bar: root link, page title, and the stable/latest
+    channel switcher. The previous/next/index links are left to the
+    bottom bar (relbar2), which keeps the theme's default rendering. #}
+{%- block relbar1 %}
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>{{ _('Navigation') }}</h3>
+      <ul>
+        <li class="right docs-channel-switcher">Docs:
+          {%- for item in docs_channels %}
+          {%- if item.name == docs_channel %}
+          <strong>{{ item.label }}</strong>
+          {%- else %}
+          <a href="{{ item.base_url }}{{ pagename }}.html"
+             title="{{ item.description }}">{{ item.label }}</a>
+          {%- endif %}
+          {%- if not loop.last %} |{% endif %}
+          {%- endfor %}</li>
+        <li class="nav-item nav-item-0"><a href="{{ pathto(root_doc)|e }}">{{ shorttitle|e }}</a>{{ reldelim1 }}</li>
+        {%- for parent in parents %}
+          <li class="nav-item nav-item-{{ loop.index }}"><a href="{{ parent.link|e }}" {% if loop.last %}{{ accesskey("U") }}{% endif %}>{{ parent.title }}</a>{{ reldelim1 }}</li>
+        {%- endfor %}
+        <li class="nav-item nav-item-this"><a href="{{ link|e }}">{{ title }}</a></li>
+      </ul>
+    </div>
+{%- endblock %}

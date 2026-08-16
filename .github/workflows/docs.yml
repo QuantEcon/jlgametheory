@@ -47,9 +47,11 @@ jobs:
         echo "version=$VERSION" >> $GITHUB_OUTPUT
 
     - name: Build documentation
+      env:
+        JLGAMETHEORY_DOCS_CHANNEL: ${{ steps.version.outputs.version }}
       run: |
         cd docs
-        sphinx-build -b html . _build/html
+        sphinx-build -W --keep-going -b html . _build/html
 
     - name: Deploy documentation
       uses: peaceiris/actions-gh-pages@v4

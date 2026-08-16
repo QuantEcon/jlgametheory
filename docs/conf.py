@@ -28,6 +28,33 @@ html_show_sourcelink = False
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
 
+# Documentation channel ("stable" or "latest") for the channel switcher
+# in the navigation bar, set by the docs deployment workflow. Empty for
+# local builds, where both channels render as links.
+docs_channel = os.environ.get("JLGAMETHEORY_DOCS_CHANNEL", "")
+docs_base_url = "https://quantecon.github.io/jlgametheory"
+
+html_context = {
+    "docs_channel": docs_channel,
+    "docs_channels": [
+        {
+            "name": "stable",
+            "label": "stable",
+            "description": "Stable release documentation",
+            "base_url": f"{docs_base_url}/stable/",
+        },
+        {
+            "name": "latest",
+            "label": "latest",
+            "description": "Latest development documentation",
+            "base_url": f"{docs_base_url}/latest/",
+        },
+    ],
+}
+
+# Canonical URL, pointing at the stable channel from both channels
+html_baseurl = f"{docs_base_url}/stable/"
+
 copybutton_prompt_text = r">>> |\.\.\. "
 copybutton_prompt_is_regexp = True
 

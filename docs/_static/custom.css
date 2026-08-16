@@ -9,6 +9,15 @@ table.autosummary code.literal {
     background-image: none !important;
 }
 
+/* stable/latest channel switcher in the navigation bar */
+li.docs-channel-switcher a {
+    text-decoration: none;
+}
+
+li.docs-channel-switcher a:hover {
+    text-decoration: underline;
+}
+
 /* Render the module prefix in function signatures like the rest of the name.
    By default .sig-name is bold and 1.1em, while .sig-prename is neither, which
    would make the "jlgametheory." prefix lighter and smaller than the function
