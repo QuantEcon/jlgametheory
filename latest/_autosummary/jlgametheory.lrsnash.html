@@ -48,10 +48,11 @@
 <dt class="sig sig-object py" id="jlgametheory.lrsnash">
 <span class="sig-prename descclassname"><span class="pre">jlgametheory.</span></span><span class="sig-name descname"><span class="pre">lrsnash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jlgametheory/jlgametheory.html#lrsnash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlgametheory.lrsnash" title="Link to this definition">¶</a></dt>
 <dd><p>Compute in exact arithmetic all extreme mixed-action Nash equilibria
-of a 2-player normal form game with integer payoffs. This function
-calls the Nash equilibrium computation routine in <code class="code docutils literal notranslate"><span class="pre">lrslib</span></code> (through
-its Julia wrapper <code class="code docutils literal notranslate"><span class="pre">LRSLib.jl</span></code>) which is based on the “lexicographic
-reverse search” vertex enumeration algorithm <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+of a 2-player normal form game with integer payoffs, with the
+lexicographic reverse search vertex enumeration algorithm.</p>
+<p>This function calls the Nash equilibrium computation routine of
+Avis, Rosenberg, Savani, and von Stengel <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> implemented in
+<code class="code docutils literal notranslate"><span class="pre">lrslib</span></code> (through its Julia wrapper <code class="code docutils literal notranslate"><span class="pre">LRSLib.jl</span></code>).</p>
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h2>
 <dl class="simple">

@@ -1,0 +1,6 @@
+﻿gnm_solve
+=========
+
+.. currentmodule:: jlgametheory
+
+.. autofunction:: jlgametheory.gnm_solve
