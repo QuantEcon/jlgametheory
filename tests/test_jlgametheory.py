@@ -18,9 +18,13 @@ def compare_lists_act_profs(operator, list_act_profs1, list_act_profs2,
                             *args, **kwargs):
     if len(list_act_profs1) != len(list_act_profs2):
         return False
+    unmatched = list(list_act_profs1)
     for prof2 in list_act_profs2:
-        if not any(compare_act_profs(operator, prof1, prof2, *args, **kwargs)
-                   for prof1 in list_act_profs1):
+        for i, prof1 in enumerate(unmatched):
+            if compare_act_profs(operator, prof1, prof2, *args, **kwargs):
+                unmatched.pop(i)
+                break
+        else:
             return False
     return True
 
