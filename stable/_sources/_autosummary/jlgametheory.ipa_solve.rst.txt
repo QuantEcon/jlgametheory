@@ -1,0 +1,6 @@
+﻿ipa_solve
+=========
+
+.. currentmodule:: jlgametheory
+
+.. autofunction:: jlgametheory.ipa_solve

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>gnm_solve &#8212; jlgametheory 0.2.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=34905f61" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=0b7eb812" />
+    <script src="../_static/documentation_options.js?v=938c9ccc"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=ccdb6887"></script>
+    <link rel="canonical" href="https://quantecon.github.io/jlgametheory/stable/_autosummary/jlgametheory.gnm_solve.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="ipa_solve" href="jlgametheory.ipa_solve.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right docs-channel-switcher">Docs:
+          <strong>stable</strong> |
+          <a href="https://quantecon.github.io/jlgametheory/latest/_autosummary/jlgametheory.gnm_solve.html"
+             title="Latest development documentation">latest</a></li>
+        <li class="nav-item nav-item-0"><a href="../index.html">jlgametheory 0.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gnm_solve</a></li>
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="gnm-solve">
+<h1>gnm_solve<a class="headerlink" href="#gnm-solve" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="jlgametheory.gnm_solve">
+<span class="sig-prename descclassname"><span class="pre">jlgametheory.</span></span><span class="sig-name descname"><span class="pre">gnm_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">ray</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jlgametheory/jlgametheory.html#gnm_solve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlgametheory.gnm_solve" title="Link to this definition">¶</a></dt>
+<dd><p>Compute mixed-action Nash equilibria of an N-player normal form game
+with the global Newton method (GNM) algorithm.</p>
+<p>This function calls the GNM routine of Govindan and Wilson <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> from
+the C++ library <a class="reference external" href="http://dags.stanford.edu/Games/gametracer.html">GameTracer</a> through its Julia
+wrapper <a class="reference external" href="https://github.com/QuantEcon/GameTracer.jl">GameTracer.jl</a>.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>g<span class="classifier">NormalFormGame</span></dt><dd><p>NormalFormGame instance with N &gt;= 2 players.</p>
+</dd>
+<dt>ray<span class="classifier">array_like(float, ndim=1), optional(default=None)</span></dt><dd><p>Perturbation ray for the GNM homotopy, of length
+<code class="code docutils literal notranslate"><span class="pre">sum(g.nums_actions)</span></code>, where the entries are interpreted in
+player-concatenated order. Different rays may lead to different
+sets of equilibria. If None, a ray is randomly generated by
+<code class="code docutils literal notranslate"><span class="pre">rng</span></code>.</p>
+</dd>
+<dt>rng<span class="classifier">int or np.random.Generator, optional(default=None)</span></dt><dd><p>Random seed or random number generator used to generate the
+default <code class="code docutils literal notranslate"><span class="pre">ray</span></code> (passed to <code class="code docutils literal notranslate"><span class="pre">np.random.default_rng</span></code>). Irrelevant if
+<code class="code docutils literal notranslate"><span class="pre">ray</span></code> is given.</p>
+</dd>
+<dt>full_output<span class="classifier">bool, optional(default=False)</span></dt><dd><p>If False, only the list of computed Nash equilibria is returned.
+If True, the return value is <code class="code docutils literal notranslate"><span class="pre">(NEs,</span> <span class="pre">res)</span></code>, where <code class="code docutils literal notranslate"><span class="pre">res</span></code> is a
+<code class="code docutils literal notranslate"><span class="pre">NashResult</span></code> object.</p>
+</dd>
+<dt>options :</dt><dd><p>Optional keyword arguments to pass to <code class="code docutils literal notranslate"><span class="pre">GameTracer.gnm_solve</span></code>:
+<code class="code docutils literal notranslate"><span class="pre">steps</span></code> (number of steps within a support cell, default 100),
+<code class="code docutils literal notranslate"><span class="pre">fuzz</span></code> (numerical zero threshold, default 1e-12), <code class="code docutils literal notranslate"><span class="pre">lnmfreq</span></code>
+(frequency of local Newton method corrections, default 3),
+<code class="code docutils literal notranslate"><span class="pre">lnmmax</span></code> (maximum iterations within the local Newton method,
+default 10), <code class="code docutils literal notranslate"><span class="pre">lambdamin</span></code> (minimum value of the continuation
+parameter, default -10.0), <code class="code docutils literal notranslate"><span class="pre">wobble</span></code> (whether to use “wobbles” of
+the perturbation vector, default False), and <code class="code docutils literal notranslate"><span class="pre">threshold</span></code> (error
+threshold to trigger a wobble, default 1e-2). See the
+<a class="reference external" href="https://quantecon.github.io/GameTracer.jl/stable/#GameTracer.gnm_solve">GameTracer.jl documentation</a>
+for details.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>NEs<span class="classifier">list(tuple(ndarray(float, ndim=1)))</span></dt><dd><p>List containing tuples of computed Nash equilibrium mixed
+actions.</p>
+</dd>
+<dt>res<span class="classifier">NashResult</span></dt><dd><p>Object containing the information about the result, returned
+only when <code class="code docutils literal notranslate"><span class="pre">full_output</span></code> is True, with the following attributes:
+<code class="code docutils literal notranslate"><span class="pre">NEs</span></code> (computed Nash equilibria), <code class="code docutils literal notranslate"><span class="pre">ret_code</span></code> (return code from
+the GNM routine, the number of equilibria found), and <code class="code docutils literal notranslate"><span class="pre">ray</span></code>
+(perturbation ray used).</p>
+</dd>
+</dl>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h2>
+<p>Consider the 3-player 2-action game with 9 Nash equilibria in
+McKelvey and McLennan (1996) “Computation of Equilibria in Finite
+Games”:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">quantecon.game_theory</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">jlgametheory</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jgt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pprint</span><span class="w"> </span><span class="kn">import</span> <span class="n">pprint</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># Reduce the digits printed</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">28</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">NormalFormGame</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">12</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NEs</span> <span class="o">=</span> <span class="n">jgt</span><span class="o">.</span><span class="n">gnm_solve</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pprint</span><span class="p">(</span><span class="n">NEs</span><span class="p">)</span>
+<span class="go">[(array([0., 1.]), array([1., 0.]), array([0., 1.])),</span>
+<span class="go"> (array([0.25, 0.75]), array([1., 0.]), array([0.25, 0.75])),</span>
+<span class="go"> (array([1., 0.]), array([1., 0.]), array([1., 0.]))]</span>
+</pre></div>
+</div>
+<p>Calls with different rays generally yield different sets of
+equilibria (here, <code class="code docutils literal notranslate"><span class="pre">rng</span></code> generates a different ray on each call as
+its state advances):</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">NEs</span> <span class="o">=</span> <span class="n">jgt</span><span class="o">.</span><span class="n">gnm_solve</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pprint</span><span class="p">(</span><span class="n">NEs</span><span class="p">)</span>
+<span class="go">[(array([1., 0.]), array([0., 1.]), array([0., 1.])),</span>
+<span class="go"> (array([0.5, 0.5]), array([0.333, 0.667]), array([0.25, 0.75])),</span>
+<span class="go"> (array([0., 1.]), array([1., 0.]), array([0., 1.])),</span>
+<span class="go"> (array([0.25, 0.75]), array([1., 0.]), array([0.25, 0.75])),</span>
+<span class="go"> (array([0.25, 0.75]), array([0.5, 0.5]), array([0.333, 0.667])),</span>
+<span class="go"> (array([0., 1.]), array([0.333, 0.667]), array([0.333, 0.667])),</span>
+<span class="go"> (array([0., 1.]), array([0., 1.]), array([1., 0.])),</span>
+<span class="go"> (array([0.5, 0.5]), array([0.5, 0.5]), array([1., 0.])),</span>
+<span class="go"> (array([1., 0.]), array([1., 0.]), array([1., 0.]))]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">all</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">is_nash</span><span class="p">(</span><span class="n">NE</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">)</span> <span class="k">for</span> <span class="n">NE</span> <span class="ow">in</span> <span class="n">NEs</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>S. Govindan and R. Wilson, “A Global Newton Method to Compute
+Nash Equilibria,” Journal of Economic Theory, 110 (2003), 65-86.</p>
+</aside>
+</aside>
+</section>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">gnm_solve</a><ul>
+<li><a class="reference internal" href="#jlgametheory.gnm_solve"><code class="docutils literal notranslate"><span class="pre">gnm_solve</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="jlgametheory.ipa_solve.html"
+                          title="previous chapter">ipa_solve</a></p>
+  </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="jlgametheory.ipa_solve.html" title="ipa_solve"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">jlgametheory 0.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">gnm_solve</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025-2026, QuantEcon.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>
