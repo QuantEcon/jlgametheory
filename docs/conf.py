@@ -65,6 +65,25 @@ except PackageNotFoundError:
     version = release = ""
 
 
+def _strip_genindex_module_annotation(app, pagename, templatename, context,
+                                      doctree):
+    """Drop the " (in module ...)" annotation from general index entries
+    (e.g. show ``lrsnash()`` instead of ``lrsnash() (in module
+    jlgametheory)``).
+    """
+    if pagename != "genindex":
+        return
+    import re
+
+    def strip(name):
+        return re.sub(r"\s*\(in module .*?\)", "", name)
+
+    context["genindexentries"] = [
+        (letter, [(strip(name), rest) for name, rest in entries])
+        for letter, entries in context["genindexentries"]
+    ]
+
+
 def _strip_autosummary_anchors(app, doctree, docname):
     """Point autosummary table links at the page, not the object's anchor.
 
@@ -84,5 +103,6 @@ def _strip_autosummary_anchors(app, doctree, docname):
 
 
 def setup(app):
+    app.connect("html-page-context", _strip_genindex_module_annotation)
     app.connect("doctree-resolved", _strip_autosummary_anchors)
     return {"parallel_read_safe": True, "parallel_write_safe": True}
