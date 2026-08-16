@@ -31,6 +31,12 @@ conda install -c conda-forge jlgametheory
   Compute in exact arithmetic all extreme mixed-action Nash equilibria of a 2-player normal form game with integer payoffs.
 * [`hc_solve`](https://quantecon.github.io/jlgametheory/stable/_autosummary/jlgametheory.hc_solve.html):
   Compute all isolated mixed-action Nash equilibria of an N-player normal form game.
+* [`ipa_solve`](https://quantecon.github.io/jlgametheory/stable/_autosummary/jlgametheory.ipa_solve.html):
+  Compute one mixed-action approximate Nash equilibrium of an N-player normal form game
+  by the iterated polymatrix approximation (IPA) algorithm.
+* [`gnm_solve`](https://quantecon.github.io/jlgametheory/stable/_autosummary/jlgametheory.gnm_solve.html):
+  Compute mixed-action Nash equilibria of an N-player normal form game
+  by the global Newton method (GNM) algorithm.
 
 ## Example usage
 
@@ -85,6 +91,41 @@ jgt.hc_solve(g)
  (array([1., 0.]), array([ 1.00e+00, -5.74e-42]), array([1., 0.])),
  (array([0., 1.]), array([1., 0.]), array([2.374e-66, 1.000e+00])),
  (array([0.5, 0.5]), array([0.333, 0.667]), array([0.25, 0.75]))]
+```
+
+### ipa_solve and gnm_solve
+
+`ipa_solve` and `gnm_solve` call the iterated polymatrix approximation (IPA) and
+global Newton method (GNM) routines in [GameTracer](http://dags.stanford.edu/Games/gametracer.html)
+(through its Julia wrapper [GameTracer.jl](https://github.com/QuantEcon/GameTracer.jl)):
+
+```python
+g = gt.NormalFormGame((2, 2, 2))
+g[0, 0, 0] = 9, 8, 12
+g[1, 1, 0] = 9, 8, 2
+g[0, 1, 1] = 3, 4, 6
+g[1, 0, 1] = 3, 4, 4
+jgt.ipa_solve(g, rng=1)
+```
+
+```
+(array([0.25, 0.75]), array([0.5, 0.5]), array([0.333, 0.667]))
+```
+
+```python
+jgt.gnm_solve(g, rng=42)
+```
+
+```
+[(array([1., 0.]), array([0., 1.]), array([0., 1.])),
+ (array([0.5, 0.5]), array([0.333, 0.667]), array([0.25, 0.75])),
+ (array([1., 0.]), array([1., 0.]), array([1., 0.])),
+ (array([0.5, 0.5]), array([0.5, 0.5]), array([1., 0.])),
+ (array([0.25, 0.75]), array([0.5, 0.5]), array([0.333, 0.667])),
+ (array([0.25, 0.75]), array([1., 0.]), array([0.25, 0.75])),
+ (array([0., 1.]), array([1., 0.]), array([0., 1.])),
+ (array([0., 1.]), array([0.333, 0.667]), array([0.333, 0.667])),
+ (array([0., 1.]), array([0., 1.]), array([1., 0.]))]
 ```
 
 ## Tutorials
