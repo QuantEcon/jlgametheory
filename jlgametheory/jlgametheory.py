@@ -218,22 +218,31 @@ def ipa_solve(g, *, ray=None, rng=None, full_output=False, **options):
     options :
         Optional keyword arguments to pass to `GameTracer.ipa_solve`:
         `zh_init` (initial condition for z-hat, default all ones),
-        `alpha` (step size fraction, default 0.02), and `fuzz` (stopping
-        tolerance, default 1e-6). See the `GameTracer.jl documentation
+        `alpha` (step size fraction, default 0.02), `fuzz` (stopping
+        tolerance, default 1e-6), `max_iter` (maximum number of
+        iterations, i.e., polymatrix approximations, default 100000),
+        and `max_pivots` (maximum number of pivoting steps per
+        Lemke-Howson solve, default 1000000). See the `GameTracer.jl
+        documentation
         <https://quantecon.github.io/GameTracer.jl/stable/#GameTracer.ipa_solve>`_
         for details.
 
     Returns
     -------
     NE : tuple(ndarray(float, ndim=1))
-        Tuple of computed Nash equilibrium mixed actions.
+        Tuple of computed (approximate) Nash equilibrium mixed actions.
+        If the routine did not converge (see `res.converged`), the last
+        iterate is returned.
 
     res : NashResult
         Object containing the information about the result, returned
         only when `full_output` is True, with the following attributes:
-        `NE` (computed Nash equilibrium), `ret_code` (return code from
-        the IPA routine, 1 on success), and `ray` (perturbation ray
-        used).
+        `NE` (computed Nash equilibrium), `converged` (whether an
+        equilibrium was found within `max_iter` iterations without the
+        routine giving up), `ret_code` (return code from the IPA
+        routine, 1 on success and 0 otherwise), `num_iter` (number of
+        iterations performed), `max_iter` (maximum number of
+        iterations), and `ray` (perturbation ray used).
 
     Examples
     --------
@@ -288,7 +297,10 @@ def ipa_solve(g, *, ray=None, rng=None, full_output=False, **options):
     if not full_output:
         return NE
     res = NashResult(NE=NE,
+                     converged=bool(res_jl.converged),
                      ret_code=int(res_jl.ret_code),
+                     num_iter=int(res_jl.num_iter),
+                     max_iter=int(res_jl.max_iter),
                      ray=res_jl.ray.to_numpy())
     return NE, res
 
@@ -334,9 +346,11 @@ def gnm_solve(g, *, ray=None, rng=None, full_output=False, **options):
         `lnmmax` (maximum iterations within the local Newton method,
         default 10), `lambdamin` (minimum value of the continuation
         parameter, default -10.0), `wobble` (whether to use "wobbles" of
-        the perturbation vector, default False), and `threshold` (error
-        threshold to trigger a wobble, default 1e-2). See the
-        `GameTracer.jl documentation
+        the perturbation vector, default False), `threshold` (error
+        threshold to trigger a wobble, default 1e-2), and `max_iter`
+        (maximum number of iterations, i.e., support cells traversed,
+        default 5000; if reached, the equilibria found so far are
+        returned). See the `GameTracer.jl documentation
         <https://quantecon.github.io/GameTracer.jl/stable/#GameTracer.gnm_solve>`_
         for details.
 
@@ -344,14 +358,16 @@ def gnm_solve(g, *, ray=None, rng=None, full_output=False, **options):
     -------
     NEs : list(tuple(ndarray(float, ndim=1)))
         List containing tuples of computed Nash equilibrium mixed
-        actions.
+        actions. If `max_iter` is reached, the list contains the
+        equilibria found up to that point.
 
     res : NashResult
         Object containing the information about the result, returned
         only when `full_output` is True, with the following attributes:
         `NEs` (computed Nash equilibria), `ret_code` (return code from
-        the GNM routine, the number of equilibria found), and `ray`
-        (perturbation ray used).
+        the GNM routine, the number of equilibria found), `num_iter`
+        (number of iterations performed), `max_iter` (maximum number of
+        iterations), and `ray` (perturbation ray used).
 
     Examples
     --------
@@ -415,5 +431,7 @@ def gnm_solve(g, *, ray=None, rng=None, full_output=False, **options):
         return NEs
     res = NashResult(NEs=NEs,
                      ret_code=int(res_jl.ret_code),
+                     num_iter=int(res_jl.num_iter),
+                     max_iter=int(res_jl.max_iter),
                      ray=res_jl.ray.to_numpy())
     return NEs, res

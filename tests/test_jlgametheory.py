@@ -169,6 +169,16 @@ def _unit_mass_ray(g):
     return ray
 
 
+def _is_mixed_action_profile(x, nums_actions, tol=1e-12):
+    if len(x) != len(nums_actions):
+        return False
+    for x_i, n in zip(x, nums_actions):
+        if len(x_i) != n or (x_i < -tol).any() or \
+           not np.isclose(x_i.sum(), 1, atol=tol):
+            return False
+    return True
+
+
 class TestIPASolve:
     def setup_method(self):
         self.game_dicts = _gametracer_game_dicts()
@@ -209,8 +219,54 @@ class TestIPASolve:
         g = self.game_dicts[0]['g']
         NE, res = ipa_solve(g, rng=1234, full_output=True)
         assert_(compare_act_profs(np.array_equal, NE, res.NE))
+        assert_(res.converged)
         assert_(res.ret_code == 1)
+        assert_(res.num_iter >= 1)
+        assert_(res.max_iter == 100000)
         assert_(res.ray.shape == (sum(g.nums_actions),))
+
+    def test_max_iter(self):
+        # 2x2x2 game: needs more than 10 iterations with this ray
+        g = self.game_dicts[1]['g']
+        ray = [0.3, 0.7, 0.6, 0.4, 0.2, 0.8]
+        _, res = ipa_solve(g, ray=ray, full_output=True)
+        assert_(res.converged)
+        needed = res.num_iter
+        assert_(needed > 10)
+
+        # Iteration limit reached: the last iterate is returned
+        for max_iter in [1, 10]:
+            NE, res = ipa_solve(g, ray=ray, max_iter=max_iter,
+                                full_output=True)
+            assert_(not res.converged)
+            assert_(res.ret_code == 0)
+            assert_(res.num_iter == max_iter)
+            assert_(res.max_iter == max_iter)
+            assert_(_is_mixed_action_profile(NE, g.nums_actions))
+
+        # Exactly enough iterations
+        NE, res = ipa_solve(g, ray=ray, max_iter=needed, full_output=True)
+        assert_(res.converged)
+        assert_(res.num_iter == needed)
+        assert_(g.is_nash(NE, tol=1e-5))
+
+    def test_max_pivots(self):
+        # 3x2 game: the Lemke-Howson path has exactly 5 pivots
+        g = self.game_dicts[0]['g']
+        ray = [0., 0., 1., 0., 1.]
+        zh_init = np.array([1/3, 1/3, 1/3, 1/2, 1/2])
+        NE, res = ipa_solve(g, ray=ray, zh_init=zh_init, max_pivots=4,
+                            full_output=True)
+        assert_(not res.converged)
+        assert_(res.ret_code == 0)
+        assert_(res.num_iter == 1)
+        assert_(_is_mixed_action_profile(NE, g.nums_actions))
+
+        NE, res = ipa_solve(g, ray=ray, zh_init=zh_init, max_pivots=5,
+                            full_output=True)
+        assert_(res.converged)
+        assert_(res.num_iter == 1)
+        assert_(g.is_nash(NE, tol=1e-6))
 
     def test_invalid_ray_length(self):
         g = self.game_dicts[0]['g']
@@ -261,7 +317,36 @@ class TestGNMSolve:
         g = self.game_dicts[0]['g']
         NEs, res = gnm_solve(g, rng=1234, full_output=True)
         assert_(res.ret_code == len(NEs))
+        assert_(res.num_iter >= 1)
+        assert_(res.max_iter == 5000)
         assert_(res.ray.shape == (sum(g.nums_actions),))
+
+    def test_max_iter(self):
+        # 3x2 game: the three equilibria are found one by one along the
+        # path
+        g = self.game_dicts[0]['g']
+        ray = [0., 0., 1., 0., 1.]
+        NEs, res = gnm_solve(g, ray=ray, full_output=True)
+        assert_(len(NEs) == 3)
+        needed = res.num_iter
+        assert_(needed > 3)
+
+        prev = 0
+        for max_iter in range(1, needed):
+            NEs, res = gnm_solve(g, ray=ray, max_iter=max_iter,
+                                 full_output=True)
+            assert_(0 <= len(NEs) <= 3)
+            assert_(len(NEs) >= prev)  # Found in path order
+            assert_(res.num_iter == max_iter)
+            assert_(res.max_iter == max_iter)
+            for NE in NEs:
+                assert_(g.is_nash(NE, tol=1e-8))
+            prev = len(NEs)
+        assert_(prev < 3)  # The last crossing is needed for the third one
+
+        NEs, res = gnm_solve(g, ray=ray, max_iter=needed, full_output=True)
+        assert_(len(NEs) == 3)
+        assert_(res.num_iter == needed)
 
     def test_invalid_ray_length(self):
         g = self.game_dicts[0]['g']
