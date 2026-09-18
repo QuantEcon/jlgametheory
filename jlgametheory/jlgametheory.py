@@ -237,7 +237,7 @@ def ipa_solve(g, *, ray=None, rng=None, full_output=False, **options):
     res : NashResult
         Object containing the information about the result, returned
         only when `full_output` is True, with the following attributes:
-        `NE` (computed Nash equilibrium), `converged` (whether an
+        `NE` (same as `NE` above), `converged` (whether an
         equilibrium was found within `max_iter` iterations without the
         routine giving up), `ret_code` (return code from the IPA
         routine, 1 on success and 0 otherwise), `num_iter` (number of
@@ -364,7 +364,7 @@ def gnm_solve(g, *, ray=None, rng=None, full_output=False, **options):
     res : NashResult
         Object containing the information about the result, returned
         only when `full_output` is True, with the following attributes:
-        `NEs` (computed Nash equilibria), `ret_code` (return code from
+        `NEs` (same as `NEs` above), `ret_code` (return code from
         the GNM routine, the number of equilibria found), `num_iter`
         (number of iterations performed), `max_iter` (maximum number of
         iterations), and `ray` (perturbation ray used).

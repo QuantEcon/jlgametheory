@@ -336,13 +336,14 @@ class TestGNMSolve:
             NEs, res = gnm_solve(g, ray=ray, max_iter=max_iter,
                                  full_output=True)
             assert_(0 <= len(NEs) <= 3)
+            assert_(res.ret_code == len(NEs))
             assert_(len(NEs) >= prev)  # Found in path order
             assert_(res.num_iter == max_iter)
             assert_(res.max_iter == max_iter)
             for NE in NEs:
                 assert_(g.is_nash(NE, tol=1e-8))
             prev = len(NEs)
-        assert_(prev < 3)  # The last crossing is needed for the third one
+        assert_(0 < prev < 3)  # The last crossing is needed for the third one
 
         NEs, res = gnm_solve(g, ray=ray, max_iter=needed, full_output=True)
         assert_(len(NEs) == 3)
