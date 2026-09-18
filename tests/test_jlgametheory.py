@@ -174,7 +174,7 @@ def _is_mixed_action_profile(x, nums_actions, tol=1e-12):
         return False
     for x_i, n in zip(x, nums_actions):
         if len(x_i) != n or (x_i < -tol).any() or \
-           not np.isclose(x_i.sum(), 1, atol=tol):
+           not np.isclose(x_i.sum(), 1, rtol=0, atol=tol):
             return False
     return True
 
