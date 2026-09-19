@@ -4,12 +4,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>jlgametheory.jlgametheory &#8212; jlgametheory 0.2.0 documentation</title>
+    <title>jlgametheory.jlgametheory &#8212; jlgametheory 0.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d75fae25" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css?v=34905f61" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=0b7eb812" />
-    <script src="../../_static/documentation_options.js?v=938c9ccc"></script>
+    <script src="../../_static/documentation_options.js?v=e259d695"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -25,7 +25,7 @@
           <strong>stable</strong> |
           <a href="https://quantecon.github.io/jlgametheory/latest/_modules/jlgametheory/jlgametheory.html"
              title="Latest development documentation">latest</a></li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">jlgametheory 0.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">jlgametheory 0.3.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">jlgametheory.jlgametheory</a></li>
       </ul>
@@ -60,7 +60,7 @@
 <div class="viewcode-block" id="lrsnash">
 <a class="viewcode-back" href="../../_autosummary/jlgametheory.lrsnash.html#jlgametheory.lrsnash">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">lrsnash</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute in exact arithmetic all extreme mixed-action Nash equilibria</span>
 <span class="sd">    of a 2-player normal form game with integer payoffs, with the</span>
 <span class="sd">    lexicographic reverse search vertex enumeration algorithm.</span>
@@ -108,19 +108,19 @@
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
 <span class="sd">    .. [1] D. Avis, G. Rosenberg, R. Savani, and B. von Stengel,</span>
-<span class="sd">       &quot;Enumeration of Nash Equilibria for Two-Player Games,&quot; Economic</span>
+<span class="sd">       "Enumeration of Nash Equilibria for Two-Player Games," Economic</span>
 <span class="sd">       Theory (2010), 9-37.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">N</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">N</span>
     <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;input must be a 2-player NormalFormGame&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">'input must be a 2-player NormalFormGame'</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">N</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Implemented only for 2-player games&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'Implemented only for 2-player games'</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-            <span class="s1">&#39;Implemented only for games with integer payoffs&#39;</span>
+            <span class="s1">'Implemented only for games with integer payoffs'</span>
         <span class="p">)</span>
 
     <span class="n">NEs_jl</span> <span class="o">=</span> <span class="n">GameTheory</span><span class="o">.</span><span class="n">lrsnash</span><span class="p">(</span><span class="n">to_jl_nfg</span><span class="p">(</span><span class="n">g</span><span class="p">))</span>
@@ -130,8 +130,8 @@
 
 <div class="viewcode-block" id="hc_solve">
 <a class="viewcode-back" href="../../_autosummary/jlgametheory.hc_solve.html#jlgametheory.hc_solve">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">hc_solve</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">ntofind</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">),</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">hc_solve</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">ntofind</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s1">'inf'</span><span class="p">),</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute all isolated mixed-action Nash equilibria of an N-player</span>
 <span class="sd">    normal form game with the polynomial homotopy continuation method.</span>
 
@@ -144,7 +144,7 @@
 <span class="sd">    g : NormalFormGame</span>
 <span class="sd">        N-player NormalFormGame instance.</span>
 
-<span class="sd">    ntofind : scalar, optional(default=float(&#39;inf&#39;))</span>
+<span class="sd">    ntofind : scalar, optional(default=float('inf'))</span>
 <span class="sd">        Number of Nash equilibria to find.</span>
 
 <span class="sd">    options :</span>
@@ -162,8 +162,8 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    Consider the 3-player 2-action game with 9 Nash equilibria in</span>
-<span class="sd">    McKelvey and McLennan (1996) &quot;Computation of Equilibria in Finite</span>
-<span class="sd">    Games&quot;:</span>
+<span class="sd">    McKelvey and McLennan (1996) "Computation of Equilibria in Finite</span>
+<span class="sd">    Games":</span>
 
 <span class="sd">    &gt;&gt;&gt; import quantecon.game_theory as gt</span>
 <span class="sd">    &gt;&gt;&gt; import jlgametheory as jgt</span>
@@ -198,13 +198,13 @@
 <span class="sd">    &gt;&gt;&gt; all(g.is_nash(NE) for NE in NEs)</span>
 <span class="sd">    True</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">N</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">N</span>
     <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;g must be a NormalFormGame&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">'g must be a NormalFormGame'</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">N</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Not implemented for 1-player games&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'Not implemented for 1-player games'</span><span class="p">)</span>
 
     <span class="n">NEs_jl</span> <span class="o">=</span> <span class="n">GameTheory</span><span class="o">.</span><span class="n">hc_solve</span><span class="p">(</span><span class="n">to_jl_nfg</span><span class="p">(</span><span class="n">g</span><span class="p">),</span> <span class="n">ntofind</span><span class="o">=</span><span class="n">ntofind</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_to_py_nes</span><span class="p">(</span><span class="n">NEs_jl</span><span class="p">)</span></div>
@@ -212,17 +212,17 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_make_ray</span><span class="p">(</span><span class="n">ray</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">rng</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Return `ray` as a float64 ndarray of shape (M,), or generate one</span>
 <span class="sd">    randomly with `rng` if `ray` is None.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">ray</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">rng</span><span class="p">)</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
     <span class="n">ray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ray</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">ray</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">M</span><span class="p">,):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s1">&#39;ray must be a 1-dim array of length sum(g.nums_actions)&#39;</span>
+            <span class="s1">'ray must be a 1-dim array of length sum(g.nums_actions)'</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="n">ray</span>
 
@@ -230,7 +230,7 @@
 <div class="viewcode-block" id="ipa_solve">
 <a class="viewcode-back" href="../../_autosummary/jlgametheory.ipa_solve.html#jlgametheory.ipa_solve">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">ipa_solve</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">ray</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">full_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute one mixed-action approximate Nash equilibrium of an N-player</span>
 <span class="sd">    normal form game with the iterated polymatrix approximation (IPA)</span>
 <span class="sd">    algorithm.</span>
@@ -265,28 +265,37 @@
 <span class="sd">    options :</span>
 <span class="sd">        Optional keyword arguments to pass to `GameTracer.ipa_solve`:</span>
 <span class="sd">        `zh_init` (initial condition for z-hat, default all ones),</span>
-<span class="sd">        `alpha` (step size fraction, default 0.02), and `fuzz` (stopping</span>
-<span class="sd">        tolerance, default 1e-6). See the `GameTracer.jl documentation</span>
+<span class="sd">        `alpha` (step size fraction, default 0.02), `fuzz` (stopping</span>
+<span class="sd">        tolerance, default 1e-6), `max_iter` (maximum number of</span>
+<span class="sd">        iterations, i.e., polymatrix approximations, default 100000),</span>
+<span class="sd">        and `max_pivots` (maximum number of pivoting steps per</span>
+<span class="sd">        Lemke-Howson solve, default 1000000). See the `GameTracer.jl</span>
+<span class="sd">        documentation</span>
 <span class="sd">        &lt;https://quantecon.github.io/GameTracer.jl/stable/#GameTracer.ipa_solve&gt;`_</span>
 <span class="sd">        for details.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    NE : tuple(ndarray(float, ndim=1))</span>
-<span class="sd">        Tuple of computed Nash equilibrium mixed actions.</span>
+<span class="sd">        Tuple of computed (approximate) Nash equilibrium mixed actions.</span>
+<span class="sd">        If the routine did not converge (see `res.converged`), the last</span>
+<span class="sd">        iterate is returned.</span>
 
 <span class="sd">    res : NashResult</span>
 <span class="sd">        Object containing the information about the result, returned</span>
 <span class="sd">        only when `full_output` is True, with the following attributes:</span>
-<span class="sd">        `NE` (computed Nash equilibrium), `ret_code` (return code from</span>
-<span class="sd">        the IPA routine, 1 on success), and `ray` (perturbation ray</span>
-<span class="sd">        used).</span>
+<span class="sd">        `NE` (same as `NE` above), `converged` (whether an</span>
+<span class="sd">        equilibrium was found within `max_iter` iterations without the</span>
+<span class="sd">        routine giving up), `ret_code` (return code from the IPA</span>
+<span class="sd">        routine, 1 on success and 0 otherwise), `num_iter` (number of</span>
+<span class="sd">        iterations performed), `max_iter` (maximum number of</span>
+<span class="sd">        iterations), and `ray` (perturbation ray used).</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    Consider the 3-player 2-action game with 9 Nash equilibria in</span>
-<span class="sd">    McKelvey and McLennan (1996) &quot;Computation of Equilibria in Finite</span>
-<span class="sd">    Games&quot;:</span>
+<span class="sd">    McKelvey and McLennan (1996) "Computation of Equilibria in Finite</span>
+<span class="sd">    Games":</span>
 
 <span class="sd">    &gt;&gt;&gt; import numpy as np</span>
 <span class="sd">    &gt;&gt;&gt; import quantecon.game_theory as gt</span>
@@ -316,17 +325,17 @@
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    .. [1] S. Govindan and R. Wilson, &quot;Computing Nash Equilibria by</span>
-<span class="sd">       Iterated Polymatrix Approximation,&quot; Journal of Economic Dynamics</span>
+<span class="sd">    .. [1] S. Govindan and R. Wilson, "Computing Nash Equilibria by</span>
+<span class="sd">       Iterated Polymatrix Approximation," Journal of Economic Dynamics</span>
 <span class="sd">       and Control, 28 (2004), 1229-1241.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">N</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">N</span>
     <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;g must be a NormalFormGame&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">'g must be a NormalFormGame'</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">N</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Not implemented for 1-player games&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'Not implemented for 1-player games'</span><span class="p">)</span>
 
     <span class="n">ray</span> <span class="o">=</span> <span class="n">_make_ray</span><span class="p">(</span><span class="n">ray</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">nums_actions</span><span class="p">),</span> <span class="n">rng</span><span class="p">)</span>
     <span class="n">res_jl</span> <span class="o">=</span> <span class="n">GameTracer</span><span class="o">.</span><span class="n">ipa_solve</span><span class="p">(</span><span class="n">to_jl_nfg</span><span class="p">(</span><span class="n">g</span><span class="p">),</span> <span class="n">ray</span><span class="o">=</span><span class="n">ray</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
@@ -335,7 +344,10 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">full_output</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">NE</span>
     <span class="n">res</span> <span class="o">=</span> <span class="n">NashResult</span><span class="p">(</span><span class="n">NE</span><span class="o">=</span><span class="n">NE</span><span class="p">,</span>
+                     <span class="n">converged</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">res_jl</span><span class="o">.</span><span class="n">converged</span><span class="p">),</span>
                      <span class="n">ret_code</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">res_jl</span><span class="o">.</span><span class="n">ret_code</span><span class="p">),</span>
+                     <span class="n">num_iter</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">res_jl</span><span class="o">.</span><span class="n">num_iter</span><span class="p">),</span>
+                     <span class="n">max_iter</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">res_jl</span><span class="o">.</span><span class="n">max_iter</span><span class="p">),</span>
                      <span class="n">ray</span><span class="o">=</span><span class="n">res_jl</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">NE</span><span class="p">,</span> <span class="n">res</span></div>
 
@@ -344,7 +356,7 @@
 <div class="viewcode-block" id="gnm_solve">
 <a class="viewcode-back" href="../../_autosummary/jlgametheory.gnm_solve.html#jlgametheory.gnm_solve">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">gnm_solve</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">ray</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">full_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute mixed-action Nash equilibria of an N-player normal form game</span>
 <span class="sd">    with the global Newton method (GNM) algorithm.</span>
 
@@ -383,10 +395,12 @@
 <span class="sd">        (frequency of local Newton method corrections, default 3),</span>
 <span class="sd">        `lnmmax` (maximum iterations within the local Newton method,</span>
 <span class="sd">        default 10), `lambdamin` (minimum value of the continuation</span>
-<span class="sd">        parameter, default -10.0), `wobble` (whether to use &quot;wobbles&quot; of</span>
-<span class="sd">        the perturbation vector, default False), and `threshold` (error</span>
-<span class="sd">        threshold to trigger a wobble, default 1e-2). See the</span>
-<span class="sd">        `GameTracer.jl documentation</span>
+<span class="sd">        parameter, default -10.0), `wobble` (whether to use "wobbles" of</span>
+<span class="sd">        the perturbation vector, default False), `threshold` (error</span>
+<span class="sd">        threshold to trigger a wobble, default 1e-2), and `max_iter`</span>
+<span class="sd">        (maximum number of iterations, i.e., support cells traversed,</span>
+<span class="sd">        default 5000; if reached, the equilibria found so far are</span>
+<span class="sd">        returned). See the `GameTracer.jl documentation</span>
 <span class="sd">        &lt;https://quantecon.github.io/GameTracer.jl/stable/#GameTracer.gnm_solve&gt;`_</span>
 <span class="sd">        for details.</span>
 
@@ -394,20 +408,22 @@
 <span class="sd">    -------</span>
 <span class="sd">    NEs : list(tuple(ndarray(float, ndim=1)))</span>
 <span class="sd">        List containing tuples of computed Nash equilibrium mixed</span>
-<span class="sd">        actions.</span>
+<span class="sd">        actions. If `max_iter` is reached, the list contains the</span>
+<span class="sd">        equilibria found up to that point.</span>
 
 <span class="sd">    res : NashResult</span>
 <span class="sd">        Object containing the information about the result, returned</span>
 <span class="sd">        only when `full_output` is True, with the following attributes:</span>
-<span class="sd">        `NEs` (computed Nash equilibria), `ret_code` (return code from</span>
-<span class="sd">        the GNM routine, the number of equilibria found), and `ray`</span>
-<span class="sd">        (perturbation ray used).</span>
+<span class="sd">        `NEs` (same as `NEs` above), `ret_code` (return code from</span>
+<span class="sd">        the GNM routine, the number of equilibria found), `num_iter`</span>
+<span class="sd">        (number of iterations performed), `max_iter` (maximum number of</span>
+<span class="sd">        iterations), and `ray` (perturbation ray used).</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    Consider the 3-player 2-action game with 9 Nash equilibria in</span>
-<span class="sd">    McKelvey and McLennan (1996) &quot;Computation of Equilibria in Finite</span>
-<span class="sd">    Games&quot;:</span>
+<span class="sd">    McKelvey and McLennan (1996) "Computation of Equilibria in Finite</span>
+<span class="sd">    Games":</span>
 
 <span class="sd">    &gt;&gt;&gt; import numpy as np</span>
 <span class="sd">    &gt;&gt;&gt; import quantecon.game_theory as gt</span>
@@ -446,16 +462,16 @@
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    .. [1] S. Govindan and R. Wilson, &quot;A Global Newton Method to Compute</span>
-<span class="sd">       Nash Equilibria,&quot; Journal of Economic Theory, 110 (2003), 65-86.</span>
+<span class="sd">    .. [1] S. Govindan and R. Wilson, "A Global Newton Method to Compute</span>
+<span class="sd">       Nash Equilibria," Journal of Economic Theory, 110 (2003), 65-86.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">N</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">N</span>
     <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;g must be a NormalFormGame&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">'g must be a NormalFormGame'</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">N</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Not implemented for 1-player games&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'Not implemented for 1-player games'</span><span class="p">)</span>
 
     <span class="n">ray</span> <span class="o">=</span> <span class="n">_make_ray</span><span class="p">(</span><span class="n">ray</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">nums_actions</span><span class="p">),</span> <span class="n">rng</span><span class="p">)</span>
     <span class="n">res_jl</span> <span class="o">=</span> <span class="n">GameTracer</span><span class="o">.</span><span class="n">gnm_solve</span><span class="p">(</span><span class="n">to_jl_nfg</span><span class="p">(</span><span class="n">g</span><span class="p">),</span> <span class="n">ray</span><span class="o">=</span><span class="n">ray</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
@@ -465,6 +481,8 @@
         <span class="k">return</span> <span class="n">NEs</span>
     <span class="n">res</span> <span class="o">=</span> <span class="n">NashResult</span><span class="p">(</span><span class="n">NEs</span><span class="o">=</span><span class="n">NEs</span><span class="p">,</span>
                      <span class="n">ret_code</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">res_jl</span><span class="o">.</span><span class="n">ret_code</span><span class="p">),</span>
+                     <span class="n">num_iter</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">res_jl</span><span class="o">.</span><span class="n">num_iter</span><span class="p">),</span>
+                     <span class="n">max_iter</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">res_jl</span><span class="o">.</span><span class="n">max_iter</span><span class="p">),</span>
                      <span class="n">ray</span><span class="o">=</span><span class="n">res_jl</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">NEs</span><span class="p">,</span> <span class="n">res</span></div>
 
@@ -496,7 +514,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">jlgametheory 0.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">jlgametheory 0.3.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">jlgametheory.jlgametheory</a></li> 
       </ul>
