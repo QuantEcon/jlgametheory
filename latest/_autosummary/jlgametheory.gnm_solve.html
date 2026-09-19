@@ -73,9 +73,11 @@ If True, the return value is <code class="code docutils literal notranslate"><sp
 <code class="code docutils literal notranslate"><span class="pre">lnmmax</span></code> (maximum iterations within the local Newton method,
 default 10), <code class="code docutils literal notranslate"><span class="pre">lambdamin</span></code> (minimum value of the continuation
 parameter, default -10.0), <code class="code docutils literal notranslate"><span class="pre">wobble</span></code> (whether to use “wobbles” of
-the perturbation vector, default False), and <code class="code docutils literal notranslate"><span class="pre">threshold</span></code> (error
-threshold to trigger a wobble, default 1e-2). See the
-<a class="reference external" href="https://quantecon.github.io/GameTracer.jl/stable/#GameTracer.gnm_solve">GameTracer.jl documentation</a>
+the perturbation vector, default False), <code class="code docutils literal notranslate"><span class="pre">threshold</span></code> (error
+threshold to trigger a wobble, default 1e-2), and <code class="code docutils literal notranslate"><span class="pre">max_iter</span></code>
+(maximum number of iterations, i.e., support cells traversed,
+default 5000; if reached, the equilibria found so far are
+returned). See the <a class="reference external" href="https://quantecon.github.io/GameTracer.jl/stable/#GameTracer.gnm_solve">GameTracer.jl documentation</a>
 for details.</p>
 </dd>
 </dl>
@@ -84,13 +86,15 @@ for details.</p>
 <h2>Returns<a class="headerlink" href="#returns" title="Link to this heading">¶</a></h2>
 <dl class="simple">
 <dt>NEs<span class="classifier">list(tuple(ndarray(float, ndim=1)))</span></dt><dd><p>List containing tuples of computed Nash equilibrium mixed
-actions.</p>
+actions. If <code class="code docutils literal notranslate"><span class="pre">max_iter</span></code> is reached, the list contains the
+equilibria found up to that point.</p>
 </dd>
 <dt>res<span class="classifier">NashResult</span></dt><dd><p>Object containing the information about the result, returned
 only when <code class="code docutils literal notranslate"><span class="pre">full_output</span></code> is True, with the following attributes:
-<code class="code docutils literal notranslate"><span class="pre">NEs</span></code> (computed Nash equilibria), <code class="code docutils literal notranslate"><span class="pre">ret_code</span></code> (return code from
-the GNM routine, the number of equilibria found), and <code class="code docutils literal notranslate"><span class="pre">ray</span></code>
-(perturbation ray used).</p>
+<code class="code docutils literal notranslate"><span class="pre">NEs</span></code> (same as <code class="code docutils literal notranslate"><span class="pre">NEs</span></code> above), <code class="code docutils literal notranslate"><span class="pre">ret_code</span></code> (return code from
+the GNM routine, the number of equilibria found), <code class="code docutils literal notranslate"><span class="pre">num_iter</span></code>
+(number of iterations performed), <code class="code docutils literal notranslate"><span class="pre">max_iter</span></code> (maximum number of
+iterations), and <code class="code docutils literal notranslate"><span class="pre">ray</span></code> (perturbation ray used).</p>
 </dd>
 </dl>
 </section>

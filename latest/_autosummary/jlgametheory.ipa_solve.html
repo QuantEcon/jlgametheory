@@ -69,8 +69,12 @@ True, the return value is <code class="code docutils literal notranslate"><span 
 </dd>
 <dt>options :</dt><dd><p>Optional keyword arguments to pass to <code class="code docutils literal notranslate"><span class="pre">GameTracer.ipa_solve</span></code>:
 <code class="code docutils literal notranslate"><span class="pre">zh_init</span></code> (initial condition for z-hat, default all ones),
-<code class="code docutils literal notranslate"><span class="pre">alpha</span></code> (step size fraction, default 0.02), and <code class="code docutils literal notranslate"><span class="pre">fuzz</span></code> (stopping
-tolerance, default 1e-6). See the <a class="reference external" href="https://quantecon.github.io/GameTracer.jl/stable/#GameTracer.ipa_solve">GameTracer.jl documentation</a>
+<code class="code docutils literal notranslate"><span class="pre">alpha</span></code> (step size fraction, default 0.02), <code class="code docutils literal notranslate"><span class="pre">fuzz</span></code> (stopping
+tolerance, default 1e-6), <code class="code docutils literal notranslate"><span class="pre">max_iter</span></code> (maximum number of
+iterations, i.e., polymatrix approximations, default 100000),
+and <code class="code docutils literal notranslate"><span class="pre">max_pivots</span></code> (maximum number of pivoting steps per
+Lemke-Howson solve, default 1000000). See the <a class="reference external" href="https://quantecon.github.io/GameTracer.jl/stable/#GameTracer.ipa_solve">GameTracer.jl
+documentation</a>
 for details.</p>
 </dd>
 </dl>
@@ -78,13 +82,18 @@ for details.</p>
 <section id="returns">
 <h2>Returns<a class="headerlink" href="#returns" title="Link to this heading">¶</a></h2>
 <dl class="simple">
-<dt>NE<span class="classifier">tuple(ndarray(float, ndim=1))</span></dt><dd><p>Tuple of computed Nash equilibrium mixed actions.</p>
+<dt>NE<span class="classifier">tuple(ndarray(float, ndim=1))</span></dt><dd><p>Tuple of computed (approximate) Nash equilibrium mixed actions.
+If the routine did not converge (see <code class="code docutils literal notranslate"><span class="pre">res.converged</span></code>), the last
+iterate is returned.</p>
 </dd>
 <dt>res<span class="classifier">NashResult</span></dt><dd><p>Object containing the information about the result, returned
 only when <code class="code docutils literal notranslate"><span class="pre">full_output</span></code> is True, with the following attributes:
-<code class="code docutils literal notranslate"><span class="pre">NE</span></code> (computed Nash equilibrium), <code class="code docutils literal notranslate"><span class="pre">ret_code</span></code> (return code from
-the IPA routine, 1 on success), and <code class="code docutils literal notranslate"><span class="pre">ray</span></code> (perturbation ray
-used).</p>
+<code class="code docutils literal notranslate"><span class="pre">NE</span></code> (same as <code class="code docutils literal notranslate"><span class="pre">NE</span></code> above), <code class="code docutils literal notranslate"><span class="pre">converged</span></code> (whether an
+equilibrium was found within <code class="code docutils literal notranslate"><span class="pre">max_iter</span></code> iterations without the
+routine giving up), <code class="code docutils literal notranslate"><span class="pre">ret_code</span></code> (return code from the IPA
+routine, 1 on success and 0 otherwise), <code class="code docutils literal notranslate"><span class="pre">num_iter</span></code> (number of
+iterations performed), <code class="code docutils literal notranslate"><span class="pre">max_iter</span></code> (maximum number of
+iterations), and <code class="code docutils literal notranslate"><span class="pre">ray</span></code> (perturbation ray used).</p>
 </dd>
 </dl>
 </section>
