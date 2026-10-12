@@ -22,6 +22,7 @@ Implemented functions
    :template: function
 
    ~jlgametheory.lrsnash
+   ~jlgametheory.support_enumeration
    ~jlgametheory.hc_solve
    ~jlgametheory.ipa_solve
    ~jlgametheory.gnm_solve

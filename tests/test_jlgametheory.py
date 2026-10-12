@@ -2,7 +2,9 @@ from fractions import Fraction
 import numpy as np
 from numpy.testing import assert_, assert_raises
 from quantecon.game_theory import NormalFormGame
-from jlgametheory import lrsnash, hc_solve, ipa_solve, gnm_solve
+from jlgametheory import (
+    lrsnash, support_enumeration, hc_solve, ipa_solve, gnm_solve
+)
 
 
 def compare_act_profs(operator, act_prof1, act_prof2, *args, **kwargs):
@@ -74,10 +76,102 @@ class TestLRSNash:
         assert_raises(NotImplementedError, lrsnash, g_float)
 
 
+def _three_player_game_dicts():
+    game_dicts = []
+
+    # 2x2x2 game from McKelvey and McLennan
+    g = NormalFormGame((2, 2, 2))
+    g[0, 0, 0] = 9, 8, 12
+    g[1, 1, 0] = 9, 8, 2
+    g[0, 1, 1] = 3, 4, 6
+    g[1, 0, 1] = 3, 4, 4
+    NEs = [
+        ([1, 0], [1, 0], [1, 0]),
+        ([0, 1], [0, 1], [1, 0]),
+        ([1, 0], [0, 1], [0, 1]),
+        ([0, 1], [1, 0], [0, 1]),
+        ([0, 1], [1/3, 2/3], [1/3, 2/3]),
+        ([1/4, 3/4], [1, 0], [1/4, 3/4]),
+        ([1/2, 1/2], [1/2, 1/2], [1, 0]),
+        ([1/4, 3/4], [1/2, 1/2], [1/3, 2/3]),
+        ([1/2, 1/2], [1/3, 2/3], [1/4, 3/4])
+    ]
+    game_dicts.append({'g': g, 'NEs': NEs})
+
+    # 2x2x2 game from Nau, Canovas, and Hansen
+    payoff_profile_array = [
+        [[(3, 0, 2), (1, 0, 0)],
+         [(0, 2, 0), (0, 1, 0)]],
+        [[(0, 1, 0), (0, 3, 0)],
+         [(1, 0, 0), (2, 0, 3)]]
+    ]
+    q = (-13 + np.sqrt(601)) / 24
+    p = (9*q - 1) / (7*q + 2)
+    r = (-3*q + 2) / (q + 1)
+    game_dicts.append({'g': NormalFormGame(payoff_profile_array),
+                       'NEs': [([p, 1-p], [q, 1-q], [r, 1-r])]})
+
+    return game_dicts
+
+
+class TestSupportEnumeration:
+    def setup_method(self):
+        self.game_dicts = _three_player_game_dicts()
+
+    def test_support_enumeration(self):
+        for d in self.game_dicts:
+            NEs_computed = support_enumeration(d['g'])
+            assert_(compare_lists_act_profs(
+                np.allclose, NEs_computed, d['NEs'], atol=1e-8
+            )
+            )
+
+    def test_ordered_by_support_size(self):
+        g = self.game_dicts[0]['g']
+        NEs = support_enumeration(g)
+        sizes = [sum((x > 0).sum() for x in NE) for NE in NEs]
+        assert_(sizes == sorted(sizes))
+
+    def test_ntofind(self):
+        g = self.game_dicts[0]['g']
+        for ntofind in [1, 3]:
+            NEs = support_enumeration(g, ntofind=ntofind)
+            assert_(len(NEs) == ntofind)
+            for NE in NEs:
+                assert_(g.is_nash(NE))
+
+    def test_tol(self):
+        for d in self.game_dicts:
+            NEs_computed = support_enumeration(d['g'], tol=1e-6)
+            assert_(compare_lists_act_profs(
+                np.allclose, NEs_computed, d['NEs'], atol=1e-6
+            )
+            )
+
+    def test_seed_reproducibility(self):
+        g = self.game_dicts[0]['g']
+        NEs0 = support_enumeration(g, seed=1234)
+        NEs1 = support_enumeration(g, seed=1234)
+        assert_(compare_lists_act_profs(np.array_equal, NEs0, NEs1))
+
+    def test_max_retries(self):
+        d = self.game_dicts[0]
+        NEs_computed = support_enumeration(d['g'], max_retries=0, seed=1234)
+        assert_(compare_lists_act_profs(
+            np.allclose, NEs_computed, d['NEs'], atol=1e-8
+        )
+        )
+
+    def test_invalid_2player_g(self):
+        bimatrix = [[(3, 3), (3, 2)],
+                    [(2, 2), (5, 6)],
+                    [(0, 3), (6, 1)]]
+        assert_raises(NotImplementedError, support_enumeration,
+                      NormalFormGame(bimatrix))
+
+
 class TestHCSolve:
     def setup_method(self):
-        self.game_dicts = []
-
         # From von Stengel 2007 in Algorithmic Game Theory
         bimatrix = [[(3, 3), (3, 2)],
                     [(2, 2), (5, 6)],
@@ -86,42 +180,7 @@ class TestHCSolve:
              'NEs': [([1, 0, 0], [1, 0]),
                      ([4/5, 1/5, 0], [2/3, 1/3]),
                      ([0, 1/3, 2/3], [1/3, 2/3])]}
-        self.game_dicts.append(d)
-
-        # 2x2x2 game from McKelvey and McLennan
-        g = NormalFormGame((2, 2, 2))
-        g[0, 0, 0] = 9, 8, 12
-        g[1, 1, 0] = 9, 8, 2
-        g[0, 1, 1] = 3, 4, 6
-        g[1, 0, 1] = 3, 4, 4
-        NEs = [
-            ([1, 0], [1, 0], [1, 0]),
-            ([0, 1], [0, 1], [1, 0]),
-            ([1, 0], [0, 1], [0, 1]),
-            ([0, 1], [1, 0], [0, 1]),
-            ([0, 1], [1/3, 2/3], [1/3, 2/3]),
-            ([1/4, 3/4], [1, 0], [1/4, 3/4]),
-            ([1/2, 1/2], [1/2, 1/2], [1, 0]),
-            ([1/4, 3/4], [1/2, 1/2], [1/3, 2/3]),
-            ([1/2, 1/2], [1/3, 2/3], [1/4, 3/4])
-        ]
-        d = {'g': g,
-             'NEs': NEs}
-        self.game_dicts.append(d)
-
-        # 2x2x2 game from Nau, Canovas, and Hansen
-        payoff_profile_array = [
-            [[(3, 0, 2), (1, 0, 0)],
-             [(0, 2, 0), (0, 1, 0)]],
-            [[(0, 1, 0), (0, 3, 0)],
-             [(1, 0, 0), (2, 0, 3)]]
-        ]
-        q = (-13 + np.sqrt(601)) / 24
-        p = (9*q - 1) / (7*q + 2)
-        r = (-3*q + 2) / (q + 1)
-        d = {'g': NormalFormGame(payoff_profile_array),
-             'NEs': [([p, 1-p], [q, 1-q], [r, 1-r])]}
-        self.game_dicts.append(d)
+        self.game_dicts = [d] + _three_player_game_dicts()
 
     def test_hc_solve(self):
         for d in self.game_dicts:
@@ -370,7 +429,8 @@ class TestGNMSolve:
 
 def test_invalid_1player_g():
     g = NormalFormGame([[1], [2], [3]])
-    for func in [lrsnash, hc_solve, ipa_solve, gnm_solve]:
+    for func in [lrsnash, support_enumeration, hc_solve, ipa_solve,
+                 gnm_solve]:
         assert_raises(NotImplementedError, func, g)
 
 
@@ -378,5 +438,6 @@ def test_invalid_input():
     bimatrix = [[(3, 3), (3, 2)],
                 [(2, 2), (5, 6)],
                 [(0, 3), (6, 1)]]
-    for func in [lrsnash, hc_solve, ipa_solve, gnm_solve]:
+    for func in [lrsnash, support_enumeration, hc_solve, ipa_solve,
+                 gnm_solve]:
         assert_raises(TypeError, func, bimatrix)

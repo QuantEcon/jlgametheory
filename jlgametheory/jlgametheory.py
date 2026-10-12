@@ -18,6 +18,18 @@ def _to_py_nes(NEs_jl):
     return [_to_py_ne(NE) for NE in NEs_jl]
 
 
+def _convert_seed(options):
+    """
+    Convert the `seed` option in `options`, if any, to `np.uint32`, as
+    required by `HomotopyContinuation.solve`.
+
+    """
+    seed = options.get('seed')
+    if seed is not None:
+        options['seed'] = np.uint32(seed)
+    return options
+
+
 def lrsnash(g):
     """
     Compute in exact arithmetic all extreme mixed-action Nash equilibria
@@ -93,7 +105,10 @@ def hc_solve(g, ntofind=float('inf'), **options):
 
     This function solves a system of polynomial equations arising from
     the nonlinear complementarity problem representation of Nash
-    equilibrium, by using `HomotopyContinuation.jl`.
+    equilibrium, by using `HomotopyContinuation.jl
+    <https://github.com/JuliaHomotopyContinuation/HomotopyContinuation.jl>`_.
+    See also :func:`support_enumeration`, which is typically much
+    faster.
 
     Parameters
     ----------
@@ -105,8 +120,8 @@ def hc_solve(g, ntofind=float('inf'), **options):
 
     options :
         Optional keyword arguments to pass to `HomotopyContinuation.solve`.
-        For example, the option `seed` can set the random seed used
-        during the computations. See the `documentation
+        For example, the option `seed` (nonnegative integer) can set the
+        random seed used during the computations. See the `documentation
         <https://www.juliahomotopycontinuation.org/HomotopyContinuation.jl/stable/solve/>`_
         for `HomotopyContinuation.solve` for details.
 
@@ -162,7 +177,111 @@ def hc_solve(g, ntofind=float('inf'), **options):
     if N < 2:
         raise NotImplementedError('Not implemented for 1-player games')
 
-    NEs_jl = GameTheory.hc_solve(to_jl_nfg(g), ntofind=ntofind, **options)
+    NEs_jl = GameTheory.hc_solve(
+        to_jl_nfg(g), ntofind=ntofind, **_convert_seed(options)
+    )
+    return _to_py_nes(NEs_jl)
+
+
+def support_enumeration(g, ntofind=float('inf'), tol=1e-8, **options):
+    """
+    Compute all mixed-action Nash equilibria of an N-player normal form
+    game with N >= 3 by support enumeration, with the polynomial
+    homotopy continuation method.
+
+    For each support profile, this function solves the system of
+    polynomial equations that makes each player indifferent among the
+    actions in their support, by using `HomotopyContinuation.jl
+    <https://github.com/JuliaHomotopyContinuation/HomotopyContinuation.jl>`_,
+    and checks whether each solution is a Nash equilibrium. For a
+    regular game, all the Nash equilibria are returned. For a
+    non-regular game, all pure-action Nash equilibria are returned, as
+    are the mixed-action ones that are nonsingular solutions of their
+    support systems; other mixed-action equilibria may or may not be
+    returned. This function is typically much faster than
+    :func:`hc_solve`, which solves a single large system of polynomial
+    equations at once.
+
+    For 2-player games, use `quantecon.game_theory.support_enumeration
+    <https://quanteconpy.readthedocs.io/en/stable/game_theory/support_enumeration.html>`_.
+
+    Parameters
+    ----------
+    g : NormalFormGame
+        NormalFormGame instance with N >= 3 players.
+
+    ntofind : scalar, optional(default=float('inf'))
+        Maximum number of Nash equilibria to find.
+
+    tol : scalar(float), optional(default=1e-8)
+        Tolerance used to check that the probabilities on the supports
+        are positive and that the mixed actions are best responses.
+
+    options :
+        Optional keyword arguments to pass to `GameTheory.HCSolver`:
+        `max_retries` (maximum number of times a system is solved again
+        with fresh random numbers when some solution paths fail to be
+        tracked, default 2) and options to pass to
+        `HomotopyContinuation.solve`, such as `seed` (nonnegative
+        integer random seed used during the computations; by default,
+        the global random number generator of Julia is used without
+        being reseeded). See the `GameTheory.jl documentation
+        <https://quantecon.github.io/GameTheory.jl/stable/lib/computing_nash_equilibria.html#GameTheory.HCSolver>`_
+        for details.
+
+    Returns
+    -------
+    NEs : list(tuple(ndarray(float, ndim=1)))
+        List containing tuples of Nash equilibrium mixed actions,
+        ordered by increasing total support size.
+
+    Examples
+    --------
+    Consider the 3-player 2-action game with 9 Nash equilibria in
+    McKelvey and McLennan (1996) "Computation of Equilibria in Finite
+    Games":
+
+    >>> import quantecon.game_theory as gt
+    >>> import jlgametheory as jgt
+    >>> from pprint import pprint
+    >>> import numpy as np
+    >>> np.set_printoptions(precision=3)  # Reduce the digits printed
+    >>> g = gt.NormalFormGame((2, 2, 2))
+    >>> g[0, 0, 0] = 9, 8, 12
+    >>> g[1, 1, 0] = 9, 8, 2
+    >>> g[0, 1, 1] = 3, 4, 6
+    >>> g[1, 0, 1] = 3, 4, 4
+    >>> NEs = jgt.support_enumeration(g)
+    >>> len(NEs)
+    9
+    >>> pprint(NEs)
+    [(array([1., 0.]), array([1., 0.]), array([1., 0.])),
+     (array([1., 0.]), array([0., 1.]), array([0., 1.])),
+     (array([0., 1.]), array([1., 0.]), array([0., 1.])),
+     (array([0., 1.]), array([0., 1.]), array([1., 0.])),
+     (array([0., 1.]), array([0.333, 0.667]), array([0.333, 0.667])),
+     (array([0.25, 0.75]), array([1., 0.]), array([0.25, 0.75])),
+     (array([0.5, 0.5]), array([0.5, 0.5]), array([1., 0.])),
+     (array([0.25, 0.75]), array([0.5, 0.5]), array([0.333, 0.667])),
+     (array([0.5, 0.5]), array([0.333, 0.667]), array([0.25, 0.75]))]
+    >>> all(g.is_nash(NE) for NE in NEs)
+    True
+
+    """
+    try:
+        N = g.N
+    except AttributeError:
+        raise TypeError('g must be a NormalFormGame')
+    if N < 3:
+        raise NotImplementedError(
+            'Implemented only for games with N >= 3 players; for 2-player '
+            'games, use quantecon.game_theory.support_enumeration'
+        )
+
+    solver = GameTheory.HCSolver(**_convert_seed(options))
+    NEs_jl = GameTheory.support_enumeration(
+        to_jl_nfg(g), solver, ntofind=ntofind, tol=tol
+    )
     return _to_py_nes(NEs_jl)
 
 
