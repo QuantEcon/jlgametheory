@@ -185,9 +185,9 @@ def hc_solve(g, ntofind=float('inf'), **options):
 
 def support_enumeration(g, ntofind=float('inf'), tol=1e-8, **options):
     """
-    Compute all mixed-action Nash equilibria of an N-player normal form
-    game with N >= 3 by support enumeration, with the polynomial
-    homotopy continuation method.
+    Compute all mixed-action Nash equilibria of an N-player regular
+    normal form game with N >= 3 by support enumeration, with the
+    polynomial homotopy continuation method.
 
     For each support profile, this function solves the system of
     polynomial equations that makes each player indifferent among the

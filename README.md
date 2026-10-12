@@ -31,7 +31,7 @@ conda install -c conda-forge jlgametheory
   Compute in exact arithmetic all extreme mixed-action Nash equilibria of a 2-player normal form game with integer payoffs,
   with the lexicographic reverse search vertex enumeration algorithm.
 * [`support_enumeration`](https://quantecon.github.io/jlgametheory/stable/_autosummary/jlgametheory.support_enumeration.html):
-  Compute all mixed-action Nash equilibria of an N-player normal form game with N >= 3
+  Compute all mixed-action Nash equilibria of an N-player regular normal form game with N >= 3
   by support enumeration, solving the polynomial indifference equations on each support profile
   with the homotopy continuation method.
 * [`ipa_solve`](https://quantecon.github.io/jlgametheory/stable/_autosummary/jlgametheory.ipa_solve.html):
@@ -72,7 +72,7 @@ jgt.lrsnash(g)
 
 ### support_enumeration
 
-`support_enumeration` computes all Nash equilibria of an N-player game with N >= 3
+`support_enumeration` computes all Nash equilibria of an N-player regular game with N >= 3
 by support enumeration, where the polynomial equations for each support profile are solved by using
 [HomotopyContinuation.jl](https://github.com/JuliaHomotopyContinuation/HomotopyContinuation.jl):
 
