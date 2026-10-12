@@ -133,20 +133,23 @@ class TestSupportEnumeration:
         assert_(sizes == sorted(sizes))
 
     def test_ntofind(self):
+        # 9 equilibria: 4 pure, then mixed ones; 8 stops within the
+        # solutions of the fully mixed support
         g = self.game_dicts[0]['g']
-        for ntofind in [1, 3]:
+        for ntofind in [0, 1, 3, 5, 8]:
             NEs = support_enumeration(g, ntofind=ntofind)
             assert_(len(NEs) == ntofind)
             for NE in NEs:
                 assert_(g.is_nash(NE))
 
     def test_tol(self):
-        for d in self.game_dicts:
-            NEs_computed = support_enumeration(d['g'], tol=1e-6)
-            assert_(compare_lists_act_profs(
-                np.allclose, NEs_computed, d['NEs'], atol=1e-6
-            )
-            )
+        # Player 0's action 0 is worse than action 1 by 5e-7, so that
+        # the pure profile (0, 0, 0) is an equilibrium only within the
+        # looser tolerance
+        g = NormalFormGame((2, 1, 1))
+        g[1, 0, 0] = 5e-7, 0, 0
+        assert_(len(support_enumeration(g, tol=1e-8)) == 1)
+        assert_(len(support_enumeration(g, tol=1e-6)) == 2)
 
     def test_seed_reproducibility(self):
         g = self.game_dicts[0]['g']
@@ -195,6 +198,14 @@ class TestHCSolve:
         NEs_computed = hc_solve(g, ntofind=1, show_progress=False)
         assert_(len(NEs_computed) == 1)
         assert_(g.is_nash(NEs_computed[0]))
+
+    def test_seed(self):
+        d = self.game_dicts[0]
+        NEs_computed = hc_solve(d['g'], seed=1234, show_progress=False)
+        assert_(compare_lists_act_profs(
+            np.allclose, NEs_computed, d['NEs'], atol=1e-15
+        )
+        )
 
 
 def _gametracer_game_dicts():

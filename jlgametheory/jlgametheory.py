@@ -120,8 +120,9 @@ def hc_solve(g, ntofind=float('inf'), **options):
 
     options :
         Optional keyword arguments to pass to `HomotopyContinuation.solve`.
-        For example, the option `seed` (nonnegative integer) can set the
-        random seed used during the computations. See the `documentation
+        For example, the option `seed` (integer in `[0, 2**32)`) can set
+        the random seed used during the computations. See the
+        `documentation
         <https://www.juliahomotopycontinuation.org/HomotopyContinuation.jl/stable/solve/>`_
         for `HomotopyContinuation.solve` for details.
 
@@ -222,10 +223,10 @@ def support_enumeration(g, ntofind=float('inf'), tol=1e-8, **options):
         `max_retries` (maximum number of times a system is solved again
         with fresh random numbers when some solution paths fail to be
         tracked, default 2) and options to pass to
-        `HomotopyContinuation.solve`, such as `seed` (nonnegative
-        integer random seed used during the computations; by default,
-        the global random number generator of Julia is used without
-        being reseeded). See the `GameTheory.jl documentation
+        `HomotopyContinuation.solve`, such as `seed` (integer in
+        `[0, 2**32)` used as the random seed during the computations; by
+        default, the global random number generator of Julia is used
+        without being reseeded). See the `GameTheory.jl documentation
         <https://quantecon.github.io/GameTheory.jl/stable/lib/computing_nash_equilibria.html#GameTheory.HCSolver>`_
         for details.
 
