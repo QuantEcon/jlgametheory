@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>support_enumeration &#8212; jlgametheory 0.3.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css?v=34905f61" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=0b7eb812" />
+    <script src="../_static/documentation_options.js?v=e259d695"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=ccdb6887"></script>
+    <link rel="canonical" href="https://quantecon.github.io/jlgametheory/stable/_autosummary/jlgametheory.support_enumeration.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="hc_solve" href="jlgametheory.hc_solve.html" />
+    <link rel="prev" title="lrsnash" href="jlgametheory.lrsnash.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right docs-channel-switcher">Docs:
+          <a href="https://quantecon.github.io/jlgametheory/stable/_autosummary/jlgametheory.support_enumeration.html"
+             title="Stable release documentation">stable</a> |
+          <strong>latest</strong></li>
+        <li class="nav-item nav-item-0"><a href="../index.html">jlgametheory 0.3.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">support_enumeration</a></li>
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="support-enumeration">
+<h1>support_enumeration<a class="headerlink" href="#support-enumeration" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="jlgametheory.support_enumeration">
+<span class="sig-prename descclassname"><span class="pre">jlgametheory.</span></span><span class="sig-name descname"><span class="pre">support_enumeration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ntofind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/jlgametheory/jlgametheory.html#support_enumeration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#jlgametheory.support_enumeration" title="Link to this definition">¶</a></dt>
+<dd><p>Compute all mixed-action Nash equilibria of an N-player regular
+normal form game with N &gt;= 3 by support enumeration, with the
+polynomial homotopy continuation method.</p>
+<p>For each support profile, this function solves the system of
+polynomial equations that makes each player indifferent among the
+actions in their support, by using <a class="reference external" href="https://github.com/JuliaHomotopyContinuation/HomotopyContinuation.jl">HomotopyContinuation.jl</a>,
+and checks whether each solution is a Nash equilibrium. For a
+regular game, all the Nash equilibria are returned. For a
+non-regular game, all pure-action Nash equilibria are returned, as
+are the mixed-action ones that are nonsingular solutions of their
+support systems; other mixed-action equilibria may or may not be
+returned. This function is typically much faster than
+<a class="reference internal" href="jlgametheory.hc_solve.html#jlgametheory.hc_solve" title="jlgametheory.hc_solve"><code class="xref py py-func docutils literal notranslate"><span class="pre">hc_solve</span></code></a>, which solves a single large system of polynomial
+equations at once.</p>
+<p>For 2-player games, use <a class="reference external" href="https://quanteconpy.readthedocs.io/en/stable/game_theory/support_enumeration.html">quantecon.game_theory.support_enumeration</a>.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>g<span class="classifier">NormalFormGame</span></dt><dd><p>NormalFormGame instance with N &gt;= 3 players.</p>
+</dd>
+<dt>ntofind<span class="classifier">scalar, optional(default=float(‘inf’))</span></dt><dd><p>Maximum number of Nash equilibria to find.</p>
+</dd>
+<dt>tol<span class="classifier">scalar(float), optional(default=1e-8)</span></dt><dd><p>Tolerance used to check that the probabilities on the supports
+are positive and that the mixed actions are best responses.</p>
+</dd>
+<dt>options :</dt><dd><p>Optional keyword arguments to pass to <code class="code docutils literal notranslate"><span class="pre">GameTheory.HCSolver</span></code>:
+<code class="code docutils literal notranslate"><span class="pre">max_retries</span></code> (maximum number of times a system is solved again
+with fresh random numbers when some solution paths fail to be
+tracked, default 2) and options to pass to
+<code class="code docutils literal notranslate"><span class="pre">HomotopyContinuation.solve</span></code>, such as <code class="code docutils literal notranslate"><span class="pre">seed</span></code> (integer in
+<code class="code docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">2**32)</span></code> used as the random seed during the computations; by
+default, the global random number generator of Julia is used
+without being reseeded). See the <a class="reference external" href="https://quantecon.github.io/GameTheory.jl/stable/lib/computing_nash_equilibria.html#GameTheory.HCSolver">GameTheory.jl documentation</a>
+for details.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>NEs<span class="classifier">list(tuple(ndarray(float, ndim=1)))</span></dt><dd><p>List containing tuples of Nash equilibrium mixed actions,
+ordered by increasing total support size.</p>
+</dd>
+</dl>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h2>
+<p>Consider the 3-player 2-action game with 9 Nash equilibria in
+McKelvey and McLennan (1996) “Computation of Equilibria in Finite
+Games”:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">quantecon.game_theory</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">jlgametheory</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">jgt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pprint</span><span class="w"> </span><span class="kn">import</span> <span class="n">pprint</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># Reduce the digits printed</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">gt</span><span class="o">.</span><span class="n">NormalFormGame</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">12</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NEs</span> <span class="o">=</span> <span class="n">jgt</span><span class="o">.</span><span class="n">support_enumeration</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">NEs</span><span class="p">)</span>
+<span class="go">9</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pprint</span><span class="p">(</span><span class="n">NEs</span><span class="p">)</span>
+<span class="go">[(array([1., 0.]), array([1., 0.]), array([1., 0.])),</span>
+<span class="go"> (array([1., 0.]), array([0., 1.]), array([0., 1.])),</span>
+<span class="go"> (array([0., 1.]), array([1., 0.]), array([0., 1.])),</span>
+<span class="go"> (array([0., 1.]), array([0., 1.]), array([1., 0.])),</span>
+<span class="go"> (array([0., 1.]), array([0.333, 0.667]), array([0.333, 0.667])),</span>
+<span class="go"> (array([0.25, 0.75]), array([1., 0.]), array([0.25, 0.75])),</span>
+<span class="go"> (array([0.5, 0.5]), array([0.5, 0.5]), array([1., 0.])),</span>
+<span class="go"> (array([0.25, 0.75]), array([0.5, 0.5]), array([0.333, 0.667])),</span>
+<span class="go"> (array([0.5, 0.5]), array([0.333, 0.667]), array([0.25, 0.75]))]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">all</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">is_nash</span><span class="p">(</span><span class="n">NE</span><span class="p">)</span> <span class="k">for</span> <span class="n">NE</span> <span class="ow">in</span> <span class="n">NEs</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</section>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">support_enumeration</a><ul>
+<li><a class="reference internal" href="#jlgametheory.support_enumeration"><code class="docutils literal notranslate"><span class="pre">support_enumeration</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="jlgametheory.lrsnash.html"
+                          title="previous chapter">lrsnash</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="jlgametheory.hc_solve.html"
+                          title="next chapter">hc_solve</a></p>
+  </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="jlgametheory.hc_solve.html" title="hc_solve"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="jlgametheory.lrsnash.html" title="lrsnash"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">jlgametheory 0.3.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">support_enumeration</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025-2026, QuantEcon.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    </div>
+  </body>
+</html>

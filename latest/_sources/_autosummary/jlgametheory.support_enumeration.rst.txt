@@ -1,0 +1,6 @@
+﻿support_enumeration
+===================
+
+.. currentmodule:: jlgametheory
+
+.. autofunction:: jlgametheory.support_enumeration
