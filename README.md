@@ -30,9 +30,10 @@ conda install -c conda-forge jlgametheory
 * [`lrsnash`](https://quantecon.github.io/jlgametheory/stable/_autosummary/jlgametheory.lrsnash.html):
   Compute in exact arithmetic all extreme mixed-action Nash equilibria of a 2-player normal form game with integer payoffs,
   with the lexicographic reverse search vertex enumeration algorithm.
-* [`hc_solve`](https://quantecon.github.io/jlgametheory/stable/_autosummary/jlgametheory.hc_solve.html):
-  Compute all isolated mixed-action Nash equilibria of an N-player normal form game
-  with the polynomial homotopy continuation method.
+* [`support_enumeration`](https://quantecon.github.io/jlgametheory/stable/_autosummary/jlgametheory.support_enumeration.html):
+  Compute all mixed-action Nash equilibria of an N-player regular normal form game with N >= 3
+  by support enumeration, solving the polynomial indifference equations on each support profile
+  with the homotopy continuation method.
 * [`ipa_solve`](https://quantecon.github.io/jlgametheory/stable/_autosummary/jlgametheory.ipa_solve.html):
   Compute one mixed-action approximate Nash equilibrium of an N-player normal form game
   with the iterated polymatrix approximation (IPA) algorithm.
@@ -69,9 +70,10 @@ jgt.lrsnash(g)
   array([Fraction(1, 1), Fraction(0, 1)], dtype=object))]
 ```
 
-### hc_solve
+### support_enumeration
 
-`hc_solve` computes all isolated Nash equilibria of an N-player game by using
+`support_enumeration` computes all Nash equilibria of an N-player regular game with N >= 3
+by support enumeration, where the polynomial equations for each support profile are solved by using
 [HomotopyContinuation.jl](https://github.com/JuliaHomotopyContinuation/HomotopyContinuation.jl):
 
 ```python
@@ -80,18 +82,18 @@ g[0, 0, 0] = 9, 8, 12
 g[1, 1, 0] = 9, 8, 2
 g[0, 1, 1] = 3, 4, 6
 g[1, 0, 1] = 3, 4, 4
-jgt.hc_solve(g)
+jgt.support_enumeration(g)
 ```
 
 ```
-[(array([0., 1.]), array([0., 1.]), array([1., 0.])),
- (array([0.5, 0.5]), array([0.5, 0.5]), array([1.000e+00, 2.351e-38])),
- (array([1., 0.]), array([0., 1.]), array([-1.881e-37,  1.000e+00])),
- (array([0.25, 0.75]), array([0.5, 0.5]), array([0.333, 0.667])),
- (array([0.25, 0.75]), array([1.000e+00, 1.345e-43]), array([0.25, 0.75])),
+[(array([1., 0.]), array([1., 0.]), array([1., 0.])),
+ (array([1., 0.]), array([0., 1.]), array([0., 1.])),
+ (array([0., 1.]), array([1., 0.]), array([0., 1.])),
+ (array([0., 1.]), array([0., 1.]), array([1., 0.])),
  (array([0., 1.]), array([0.333, 0.667]), array([0.333, 0.667])),
- (array([1., 0.]), array([ 1.00e+00, -5.74e-42]), array([1., 0.])),
- (array([0., 1.]), array([1., 0.]), array([2.374e-66, 1.000e+00])),
+ (array([0.25, 0.75]), array([1., 0.]), array([0.25, 0.75])),
+ (array([0.5, 0.5]), array([0.5, 0.5]), array([1., 0.])),
+ (array([0.25, 0.75]), array([0.5, 0.5]), array([0.333, 0.667])),
  (array([0.5, 0.5]), array([0.333, 0.667]), array([0.25, 0.75]))]
 ```
 
