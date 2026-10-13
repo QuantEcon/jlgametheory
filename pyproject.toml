@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "jlgametheory"
-version = "0.3.0"
+version = "0.4.0"
 description = "Python interface to GameTheory.jl"
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -23,7 +23,7 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = [
     "numpy>=1.22",
     "quantecon>=0.8",
