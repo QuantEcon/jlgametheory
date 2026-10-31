@@ -1,6 +1,6 @@
 import numpy as np
 from quantecon.game_theory.utilities import NashResult
-from . import GameTheory, GameTracer
+from . import jl, GameTheory, GameTracer, StrategicGames
 
 
 def to_jl_nfg(g):
@@ -554,4 +554,251 @@ def gnm_solve(g, *, ray=None, rng=None, full_output=False, **options):
                      num_iter=int(res_jl.num_iter),
                      max_iter=int(res_jl.max_iter),
                      ray=res_jl.ray.to_numpy())
+    return NEs, res
+
+
+_VERBOSITY_LEVELS = ('NONE', 'LOW', 'STD', 'HIGH', 'FULL')
+
+
+def _convert_sg_options(options):
+    """
+    Convert the options to pass to the `StrategicGames` functions:
+    `verbosity` given as a string is converted to the corresponding
+    `StrategicGames.Verbosity` enum value, and the keyword `ϵ`, which
+    Python normalizes to `ε` in keyword arguments, is restored.
+
+    """
+    verbosity = options.get('verbosity')
+    if isinstance(verbosity, str):
+        if verbosity.upper() not in _VERBOSITY_LEVELS:
+            raise ValueError(
+                f'verbosity must be one of {_VERBOSITY_LEVELS}'
+            )
+        options['verbosity'] = getattr(StrategicGames, verbosity.upper())
+    if 'ε' in options:
+        options['ϵ'] = options.pop('ε')
+    return options
+
+
+def _to_jl_init(init, nums_actions):
+    """
+    Convert `init`, a sequence of mixed actions, to a Julia
+    `Vector{Vector{Float64}}`, checking its shape against
+    `nums_actions`.
+
+    """
+    if len(init) != len(nums_actions):
+        raise ValueError('init must contain one mixed action per player')
+    init_arrays = []
+    for i, (x, n) in enumerate(zip(init, nums_actions)):
+        x = np.asarray(x, dtype=np.float64)
+        if x.shape != (n,):
+            raise ValueError(
+                f'init[{i}] must be a 1-dim array of length {n}'
+            )
+        init_arrays.append(x)
+    return jl.Vector[jl.Vector[jl.Float64]](init_arrays)
+
+
+def _to_py_supports(supports_jl):
+    """
+    Convert a Julia `Vector{Vector{Int64}}` of 1-based supports to a
+    tuple of 0-based int ndarrays.
+
+    """
+    return tuple(np.asarray(s, dtype=np.int64) - 1 for s in supports_jl)
+
+
+def nash_cp(g, *, init=None, full_output=False, **options):
+    """
+    Compute one mixed-action Nash equilibrium of an N-player normal form
+    game by solving the complementarity problem formulation as a
+    nonlinear program.
+
+    This function calls `nash_cp` of `StrategicGames.jl
+    <https://github.com/sylvaticus/StrategicGames.jl>`_, which solves
+    the nonlinear program with
+    `Ipopt <https://github.com/jump-dev/Ipopt.jl>`_.
+
+    Parameters
+    ----------
+    g : NormalFormGame
+        NormalFormGame instance with N >= 2 players.
+
+    init : array_like(array_like(float, ndim=1)), optional(default=None)
+        Initial mixed-action profile, an array of N arrays of floats. If
+        None, the uniform mixed action is used for every player.
+
+    full_output : bool, optional(default=False)
+        If False, only the computed Nash equilibrium is returned. If
+        True, the return value is `(NE, res)`, where `res` is a
+        `NashResult` object.
+
+    options :
+        Optional keyword arguments to pass to `StrategicGames.nash_cp`.
+        See the `StrategicGames.jl documentation
+        <https://sylvaticus.github.io/StrategicGames.jl/stable/api.html#StrategicGames.nash_cp-Tuple{Any}>`_
+        for details.
+
+    Returns
+    -------
+    NE : tuple(ndarray(float, ndim=1))
+        Tuple of computed Nash equilibrium mixed actions. None if the
+        solver did not return a solution.
+
+    res : NashResult
+        Object containing the information about the result, returned
+        only when `full_output` is True, with the following attributes:
+        `NE` (same as `NE` above), `status` (termination status of the
+        solver as a string), and `expected_payoffs` (ndarray of the
+        payoffs of the players at `NE`, empty if `NE` is None).
+
+    Examples
+    --------
+    Consider the 3-player 2-action game with 9 Nash equilibria in
+    McKelvey and McLennan (1996) "Computation of Equilibria in Finite
+    Games":
+
+    >>> import numpy as np
+    >>> import quantecon.game_theory as gt
+    >>> import jlgametheory as jgt
+    >>> np.set_printoptions(precision=3)  # Reduce the digits printed
+    >>> g = gt.NormalFormGame((2, 2, 2))
+    >>> g[0, 0, 0] = 9, 8, 12
+    >>> g[1, 1, 0] = 9, 8, 2
+    >>> g[0, 1, 1] = 3, 4, 6
+    >>> g[1, 0, 1] = 3, 4, 4
+    >>> NE = jgt.nash_cp(g)
+    >>> NE
+    (array([0.5, 0.5]), array([0.5, 0.5]), array([ 1.000e+00, -1.353e-32]))
+    >>> g.is_nash(NE, tol=1e-5)  # Relax tolerance
+    True
+
+    """
+    try:
+        N = g.N
+    except AttributeError:
+        raise TypeError('g must be a NormalFormGame')
+    if N < 2:
+        raise NotImplementedError('Not implemented for 1-player games')
+
+    if init is not None:
+        options['init'] = _to_jl_init(init, g.nums_actions)
+    res_jl = StrategicGames.nash_cp(
+        to_jl_nfg(g), **_convert_sg_options(options)
+    )
+    strategies_jl = res_jl.equilibrium_strategies
+    NE = _to_py_ne(strategies_jl) if len(strategies_jl) > 0 else None
+
+    if not full_output:
+        return NE
+    res = NashResult(NE=NE,
+                     status=str(res_jl.status),
+                     expected_payoffs=res_jl.expected_payoffs.to_numpy())
+    return NE, res
+
+
+def nash_se(g, *, full_output=False, **options):
+    """
+    Compute mixed-action Nash equilibria of an N-player normal form game
+    by support enumeration, solving the indifference conditions on each
+    support profile with linear or nonlinear programming.
+
+    This function calls `nash_se` of `StrategicGames.jl
+    <https://github.com/sylvaticus/StrategicGames.jl>`_, which solves
+    the linear programs with
+    `HiGHS <https://github.com/jump-dev/HiGHS.jl>`_ for N = 2 and the
+    nonlinear programs with
+    `Ipopt <https://github.com/jump-dev/Ipopt.jl>`_ for N >= 3.
+
+    Parameters
+    ----------
+    g : NormalFormGame
+        NormalFormGame instance with N >= 2 players.
+
+    full_output : bool, optional(default=False)
+        If False, only the list of computed Nash equilibria is returned.
+        If True, the return value is `(NEs, res)`, where `res` is a
+        `NashResult` object.
+
+    options :
+        Optional keyword arguments to pass to `StrategicGames.nash_se`.
+        In particular, `max_samples` is the maximum number of Nash
+        equilibria to find (default 1; `float('inf')` for no limit). See the
+        `StrategicGames.jl documentation
+        <https://sylvaticus.github.io/StrategicGames.jl/stable/api.html#StrategicGames.nash_se-Tuple{Any}>`_
+        for details.
+
+    Returns
+    -------
+    NEs : list(tuple(ndarray(float, ndim=1)))
+        List containing tuples of computed Nash equilibrium mixed
+        actions.
+
+    res : NashResult
+        Object containing the information about the result, returned
+        only when `full_output` is True, with the following attributes:
+        `NEs` (same as `NEs` above), `expected_payoffs` (list of
+        ndarrays of the payoffs of the players at each equilibrium), and
+        `supports` (list of tuples of 0-based int ndarrays of the
+        support profile on which each equilibrium was found).
+
+    Examples
+    --------
+    Consider the 3-player 2-action game with 9 Nash equilibria in
+    McKelvey and McLennan (1996) "Computation of Equilibria in Finite
+    Games":
+
+    >>> import numpy as np
+    >>> import quantecon.game_theory as gt
+    >>> import jlgametheory as jgt
+    >>> from pprint import pprint
+    >>> np.set_printoptions(precision=3)  # Reduce the digits printed
+    >>> g = gt.NormalFormGame((2, 2, 2))
+    >>> g[0, 0, 0] = 9, 8, 12
+    >>> g[1, 1, 0] = 9, 8, 2
+    >>> g[0, 1, 1] = 3, 4, 6
+    >>> g[1, 0, 1] = 3, 4, 4
+    >>> NEs = jgt.nash_se(g)
+    >>> NEs
+    [(array([1., 0.]), array([1., 0.]), array([1., 0.]))]
+    >>> NEs = jgt.nash_se(g, max_samples=float('inf'))
+    >>> len(NEs)
+    8
+    >>> pprint(NEs)
+    [(array([1., 0.]), array([1., 0.]), array([1., 0.])),
+     (array([0., 1.]), array([0., 1.]), array([1., 0.])),
+     (array([0., 1.]), array([1., 0.]), array([0., 1.])),
+     (array([1., 0.]), array([0., 1.]), array([0., 1.])),
+     (array([0.5, 0.5]), array([0.5, 0.5]), array([1., 0.])),
+     (array([0.25, 0.75]), array([1., 0.]), array([0.25, 0.75])),
+     (array([0., 1.]), array([0.333, 0.667]), array([0.333, 0.667])),
+     (array([0.5, 0.5]), array([0.333, 0.667]), array([0.25, 0.75]))]
+    >>> all(g.is_nash(NE, tol=1e-5) for NE in NEs)  # Relax tolerance
+    True
+
+    This game in fact has two full-support equilibria: `nash_se` returns
+    at most one equilibrium per support profile and thus does not reach
+    one of those equilibria.
+
+    """
+    try:
+        N = g.N
+    except AttributeError:
+        raise TypeError('g must be a NormalFormGame')
+    if N < 2:
+        raise NotImplementedError('Not implemented for 1-player games')
+
+    eqs_jl = StrategicGames.nash_se(
+        to_jl_nfg(g), **_convert_sg_options(options)
+    )
+    NEs = [_to_py_ne(eq.equilibrium_strategies) for eq in eqs_jl]
+
+    if not full_output:
+        return NEs
+    res = NashResult(
+        NEs=NEs,
+        expected_payoffs=[eq.expected_payoffs.to_numpy() for eq in eqs_jl],
+        supports=[_to_py_supports(eq.supports) for eq in eqs_jl],
+    )
     return NEs, res
