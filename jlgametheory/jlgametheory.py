@@ -740,9 +740,8 @@ def nash_se(g, *, full_output=False, **options):
         only when `full_output` is True, with the following attributes:
         `NEs` (same as `NEs` above), `expected_payoffs` (list of
         ndarrays of the payoffs of the players at each equilibrium), and
-        `supports` (list of tuples of int ndarrays of the support, i.e.,
-        the action indices with positive probability, of each player at
-        each equilibrium).
+        `supports` (list of tuples of 0-based int ndarrays of the
+        support profile on which each equilibrium was found).
 
     Examples
     --------
