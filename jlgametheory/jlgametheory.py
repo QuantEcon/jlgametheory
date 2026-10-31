@@ -724,7 +724,7 @@ def nash_se(g, *, full_output=False, **options):
     options :
         Optional keyword arguments to pass to `StrategicGames.nash_se`.
         In particular, `max_samples` is the maximum number of Nash
-        equilibria to find (default 1; `float('inf')` for all). See the
+        equilibria to find (default 1; `float('inf')` for no limit). See the
         `StrategicGames.jl documentation
         <https://sylvaticus.github.io/StrategicGames.jl/stable/api.html#StrategicGames.nash_se-Tuple{Any}>`_
         for details.

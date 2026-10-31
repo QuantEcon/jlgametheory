@@ -589,6 +589,15 @@ class TestNashSE:
                     assert_(np.array_equal(np.flatnonzero(x > 1e-5),
                                            support))
 
+    def test_no_solution(self):
+        # Matching pennies has no pure-action equilibrium
+        g = NormalFormGame([[(1, -1), (-1, 1)], [(-1, 1), (1, -1)]])
+        NEs, res = nash_se(g, allow_mixed=False, full_output=True)
+        assert_(NEs == [])
+        assert_(res.NEs == [])
+        assert_(res.expected_payoffs == [])
+        assert_(res.supports == [])
+
     def test_isolated_eq_only(self):
         # Degenerate game with 3 extreme equilibria
         bimatrix = [[(3, 3), (3, 3)],
