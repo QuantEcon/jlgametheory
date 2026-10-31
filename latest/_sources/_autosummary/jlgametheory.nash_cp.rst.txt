@@ -1,0 +1,6 @@
+﻿nash_cp
+=======
+
+.. currentmodule:: jlgametheory
+
+.. autofunction:: jlgametheory.nash_cp

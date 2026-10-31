@@ -39,7 +39,7 @@
   <h1>Source code for jlgametheory.jlgametheory</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">quantecon.game_theory.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">NashResult</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">GameTheory</span><span class="p">,</span> <span class="n">GameTracer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">jl</span><span class="p">,</span> <span class="n">GameTheory</span><span class="p">,</span> <span class="n">GameTracer</span><span class="p">,</span> <span class="n">StrategicGames</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">to_jl_nfg</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
@@ -609,6 +609,259 @@
                      <span class="n">ray</span><span class="o">=</span><span class="n">res_jl</span><span class="o">.</span><span class="n">ray</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">NEs</span><span class="p">,</span> <span class="n">res</span></div>
 
+
+
+<span class="n">_VERBOSITY_LEVELS</span> <span class="o">=</span> <span class="p">(</span><span class="s1">'NONE'</span><span class="p">,</span> <span class="s1">'LOW'</span><span class="p">,</span> <span class="s1">'STD'</span><span class="p">,</span> <span class="s1">'HIGH'</span><span class="p">,</span> <span class="s1">'FULL'</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_convert_sg_options</span><span class="p">(</span><span class="n">options</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Convert the options to pass to the `StrategicGames` functions:</span>
+<span class="sd">    `verbosity` given as a string is converted to the corresponding</span>
+<span class="sd">    `StrategicGames.Verbosity` enum value, and the keyword `ϵ`, which</span>
+<span class="sd">    Python normalizes to `ε` in keyword arguments, is restored.</span>
+
+<span class="sd">    """</span>
+    <span class="n">verbosity</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'verbosity'</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">verbosity</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">verbosity</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_VERBOSITY_LEVELS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">'verbosity must be one of </span><span class="si">{</span><span class="n">_VERBOSITY_LEVELS</span><span class="si">}</span><span class="s1">'</span>
+            <span class="p">)</span>
+        <span class="n">options</span><span class="p">[</span><span class="s1">'verbosity'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">StrategicGames</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+    <span class="k">if</span> <span class="s1">'ε'</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+        <span class="n">options</span><span class="p">[</span><span class="s1">'ϵ'</span><span class="p">]</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">'ε'</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">options</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_to_jl_init</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">nums_actions</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Convert `init`, a sequence of mixed actions, to a Julia</span>
+<span class="sd">    `Vector{Vector{Float64}}`, checking its shape against</span>
+<span class="sd">    `nums_actions`.</span>
+
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">init</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">nums_actions</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'init must contain one mixed action per player'</span><span class="p">)</span>
+    <span class="n">init_arrays</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">nums_actions</span><span class="p">)):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">n</span><span class="p">,):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">'init[</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">] must be a 1-dim array of length </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s1">'</span>
+            <span class="p">)</span>
+        <span class="n">init_arrays</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">jl</span><span class="o">.</span><span class="n">Vector</span><span class="p">[</span><span class="n">jl</span><span class="o">.</span><span class="n">Vector</span><span class="p">[</span><span class="n">jl</span><span class="o">.</span><span class="n">Float64</span><span class="p">]](</span><span class="n">init_arrays</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_to_py_supports</span><span class="p">(</span><span class="n">supports_jl</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Convert a Julia `Vector{Vector{Int64}}` of 1-based supports to a</span>
+<span class="sd">    tuple of 0-based int ndarrays.</span>
+
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">supports_jl</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="nash_cp">
+<a class="viewcode-back" href="../../_autosummary/jlgametheory.nash_cp.html#jlgametheory.nash_cp">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">nash_cp</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">full_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Compute one mixed-action Nash equilibrium of an N-player normal form</span>
+<span class="sd">    game by solving the complementarity problem formulation as a</span>
+<span class="sd">    nonlinear program.</span>
+
+<span class="sd">    This function calls `nash_cp` of `StrategicGames.jl</span>
+<span class="sd">    &lt;https://github.com/sylvaticus/StrategicGames.jl&gt;`_, which solves</span>
+<span class="sd">    the nonlinear program with</span>
+<span class="sd">    `Ipopt &lt;https://github.com/jump-dev/Ipopt.jl&gt;`_.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    g : NormalFormGame</span>
+<span class="sd">        NormalFormGame instance with N &gt;= 2 players.</span>
+
+<span class="sd">    init : array_like(array_like(float, ndim=1)), optional(default=None)</span>
+<span class="sd">        Initial mixed-action profile, an array of N arrays of floats. If</span>
+<span class="sd">        None, the uniform mixed action is used for every player.</span>
+
+<span class="sd">    full_output : bool, optional(default=False)</span>
+<span class="sd">        If False, only the computed Nash equilibrium is returned. If</span>
+<span class="sd">        True, the return value is `(NE, res)`, where `res` is a</span>
+<span class="sd">        `NashResult` object.</span>
+
+<span class="sd">    options :</span>
+<span class="sd">        Optional keyword arguments to pass to `StrategicGames.nash_cp`.</span>
+<span class="sd">        See the `StrategicGames.jl documentation</span>
+<span class="sd">        &lt;https://sylvaticus.github.io/StrategicGames.jl/stable/api.html#StrategicGames.nash_cp-Tuple{Any}&gt;`_</span>
+<span class="sd">        for details.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    NE : tuple(ndarray(float, ndim=1))</span>
+<span class="sd">        Tuple of computed Nash equilibrium mixed actions. None if the</span>
+<span class="sd">        solver did not return a solution.</span>
+
+<span class="sd">    res : NashResult</span>
+<span class="sd">        Object containing the information about the result, returned</span>
+<span class="sd">        only when `full_output` is True, with the following attributes:</span>
+<span class="sd">        `NE` (same as `NE` above), `status` (termination status of the</span>
+<span class="sd">        solver as a string), and `expected_payoffs` (ndarray of the</span>
+<span class="sd">        payoffs of the players at `NE`, empty if `NE` is None).</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Consider the 3-player 2-action game with 9 Nash equilibria in</span>
+<span class="sd">    McKelvey and McLennan (1996) "Computation of Equilibria in Finite</span>
+<span class="sd">    Games":</span>
+
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; import quantecon.game_theory as gt</span>
+<span class="sd">    &gt;&gt;&gt; import jlgametheory as jgt</span>
+<span class="sd">    &gt;&gt;&gt; np.set_printoptions(precision=3)  # Reduce the digits printed</span>
+<span class="sd">    &gt;&gt;&gt; g = gt.NormalFormGame((2, 2, 2))</span>
+<span class="sd">    &gt;&gt;&gt; g[0, 0, 0] = 9, 8, 12</span>
+<span class="sd">    &gt;&gt;&gt; g[1, 1, 0] = 9, 8, 2</span>
+<span class="sd">    &gt;&gt;&gt; g[0, 1, 1] = 3, 4, 6</span>
+<span class="sd">    &gt;&gt;&gt; g[1, 0, 1] = 3, 4, 4</span>
+<span class="sd">    &gt;&gt;&gt; NE = jgt.nash_cp(g)</span>
+<span class="sd">    &gt;&gt;&gt; NE</span>
+<span class="sd">    (array([0.5, 0.5]), array([0.5, 0.5]), array([ 1.000e+00, -1.353e-32]))</span>
+<span class="sd">    &gt;&gt;&gt; g.is_nash(NE, tol=1e-5)  # Relax tolerance</span>
+<span class="sd">    True</span>
+
+<span class="sd">    """</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">N</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">'g must be a NormalFormGame'</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">N</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'Not implemented for 1-player games'</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">init</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">options</span><span class="p">[</span><span class="s1">'init'</span><span class="p">]</span> <span class="o">=</span> <span class="n">_to_jl_init</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">nums_actions</span><span class="p">)</span>
+    <span class="n">res_jl</span> <span class="o">=</span> <span class="n">StrategicGames</span><span class="o">.</span><span class="n">nash_cp</span><span class="p">(</span>
+        <span class="n">to_jl_nfg</span><span class="p">(</span><span class="n">g</span><span class="p">),</span> <span class="o">**</span><span class="n">_convert_sg_options</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">strategies_jl</span> <span class="o">=</span> <span class="n">res_jl</span><span class="o">.</span><span class="n">equilibrium_strategies</span>
+    <span class="n">NE</span> <span class="o">=</span> <span class="n">_to_py_ne</span><span class="p">(</span><span class="n">strategies_jl</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">strategies_jl</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">full_output</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">NE</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">NashResult</span><span class="p">(</span><span class="n">NE</span><span class="o">=</span><span class="n">NE</span><span class="p">,</span>
+                     <span class="n">status</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">res_jl</span><span class="o">.</span><span class="n">status</span><span class="p">),</span>
+                     <span class="n">expected_payoffs</span><span class="o">=</span><span class="n">res_jl</span><span class="o">.</span><span class="n">expected_payoffs</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">NE</span><span class="p">,</span> <span class="n">res</span></div>
+
+
+
+<div class="viewcode-block" id="nash_se">
+<a class="viewcode-back" href="../../_autosummary/jlgametheory.nash_se.html#jlgametheory.nash_se">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">nash_se</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">full_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Compute mixed-action Nash equilibria of an N-player normal form game</span>
+<span class="sd">    by support enumeration, solving the indifference conditions on each</span>
+<span class="sd">    support profile with linear or nonlinear programming.</span>
+
+<span class="sd">    This function calls `nash_se` of `StrategicGames.jl</span>
+<span class="sd">    &lt;https://github.com/sylvaticus/StrategicGames.jl&gt;`_, which solves</span>
+<span class="sd">    the linear programs with</span>
+<span class="sd">    `HiGHS &lt;https://github.com/jump-dev/HiGHS.jl&gt;`_ for N = 2 and the</span>
+<span class="sd">    nonlinear programs with</span>
+<span class="sd">    `Ipopt &lt;https://github.com/jump-dev/Ipopt.jl&gt;`_ for N &gt;= 3.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    g : NormalFormGame</span>
+<span class="sd">        NormalFormGame instance with N &gt;= 2 players.</span>
+
+<span class="sd">    full_output : bool, optional(default=False)</span>
+<span class="sd">        If False, only the list of computed Nash equilibria is returned.</span>
+<span class="sd">        If True, the return value is `(NEs, res)`, where `res` is a</span>
+<span class="sd">        `NashResult` object.</span>
+
+<span class="sd">    options :</span>
+<span class="sd">        Optional keyword arguments to pass to `StrategicGames.nash_se`.</span>
+<span class="sd">        In particular, `max_samples` is the maximum number of Nash</span>
+<span class="sd">        equilibria to find (default 1; `float('inf')` for no limit). See the</span>
+<span class="sd">        `StrategicGames.jl documentation</span>
+<span class="sd">        &lt;https://sylvaticus.github.io/StrategicGames.jl/stable/api.html#StrategicGames.nash_se-Tuple{Any}&gt;`_</span>
+<span class="sd">        for details.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    NEs : list(tuple(ndarray(float, ndim=1)))</span>
+<span class="sd">        List containing tuples of computed Nash equilibrium mixed</span>
+<span class="sd">        actions.</span>
+
+<span class="sd">    res : NashResult</span>
+<span class="sd">        Object containing the information about the result, returned</span>
+<span class="sd">        only when `full_output` is True, with the following attributes:</span>
+<span class="sd">        `NEs` (same as `NEs` above), `expected_payoffs` (list of</span>
+<span class="sd">        ndarrays of the payoffs of the players at each equilibrium), and</span>
+<span class="sd">        `supports` (list of tuples of 0-based int ndarrays of the</span>
+<span class="sd">        support profile on which each equilibrium was found).</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Consider the 3-player 2-action game with 9 Nash equilibria in</span>
+<span class="sd">    McKelvey and McLennan (1996) "Computation of Equilibria in Finite</span>
+<span class="sd">    Games":</span>
+
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; import quantecon.game_theory as gt</span>
+<span class="sd">    &gt;&gt;&gt; import jlgametheory as jgt</span>
+<span class="sd">    &gt;&gt;&gt; from pprint import pprint</span>
+<span class="sd">    &gt;&gt;&gt; np.set_printoptions(precision=3)  # Reduce the digits printed</span>
+<span class="sd">    &gt;&gt;&gt; g = gt.NormalFormGame((2, 2, 2))</span>
+<span class="sd">    &gt;&gt;&gt; g[0, 0, 0] = 9, 8, 12</span>
+<span class="sd">    &gt;&gt;&gt; g[1, 1, 0] = 9, 8, 2</span>
+<span class="sd">    &gt;&gt;&gt; g[0, 1, 1] = 3, 4, 6</span>
+<span class="sd">    &gt;&gt;&gt; g[1, 0, 1] = 3, 4, 4</span>
+<span class="sd">    &gt;&gt;&gt; NEs = jgt.nash_se(g)</span>
+<span class="sd">    &gt;&gt;&gt; NEs</span>
+<span class="sd">    [(array([1., 0.]), array([1., 0.]), array([1., 0.]))]</span>
+<span class="sd">    &gt;&gt;&gt; NEs = jgt.nash_se(g, max_samples=float('inf'))</span>
+<span class="sd">    &gt;&gt;&gt; len(NEs)</span>
+<span class="sd">    8</span>
+<span class="sd">    &gt;&gt;&gt; pprint(NEs)</span>
+<span class="sd">    [(array([1., 0.]), array([1., 0.]), array([1., 0.])),</span>
+<span class="sd">     (array([0., 1.]), array([0., 1.]), array([1., 0.])),</span>
+<span class="sd">     (array([0., 1.]), array([1., 0.]), array([0., 1.])),</span>
+<span class="sd">     (array([1., 0.]), array([0., 1.]), array([0., 1.])),</span>
+<span class="sd">     (array([0.5, 0.5]), array([0.5, 0.5]), array([1., 0.])),</span>
+<span class="sd">     (array([0.25, 0.75]), array([1., 0.]), array([0.25, 0.75])),</span>
+<span class="sd">     (array([0., 1.]), array([0.333, 0.667]), array([0.333, 0.667])),</span>
+<span class="sd">     (array([0.5, 0.5]), array([0.333, 0.667]), array([0.25, 0.75]))]</span>
+<span class="sd">    &gt;&gt;&gt; all(g.is_nash(NE, tol=1e-5) for NE in NEs)  # Relax tolerance</span>
+<span class="sd">    True</span>
+
+<span class="sd">    This game in fact has two full-support equilibria: `nash_se` returns</span>
+<span class="sd">    at most one equilibrium per support profile and thus does not reach</span>
+<span class="sd">    one of those equilibria.</span>
+
+<span class="sd">    """</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">N</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">'g must be a NormalFormGame'</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">N</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'Not implemented for 1-player games'</span><span class="p">)</span>
+
+    <span class="n">eqs_jl</span> <span class="o">=</span> <span class="n">StrategicGames</span><span class="o">.</span><span class="n">nash_se</span><span class="p">(</span>
+        <span class="n">to_jl_nfg</span><span class="p">(</span><span class="n">g</span><span class="p">),</span> <span class="o">**</span><span class="n">_convert_sg_options</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">NEs</span> <span class="o">=</span> <span class="p">[</span><span class="n">_to_py_ne</span><span class="p">(</span><span class="n">eq</span><span class="o">.</span><span class="n">equilibrium_strategies</span><span class="p">)</span> <span class="k">for</span> <span class="n">eq</span> <span class="ow">in</span> <span class="n">eqs_jl</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">full_output</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">NEs</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">NashResult</span><span class="p">(</span>
+        <span class="n">NEs</span><span class="o">=</span><span class="n">NEs</span><span class="p">,</span>
+        <span class="n">expected_payoffs</span><span class="o">=</span><span class="p">[</span><span class="n">eq</span><span class="o">.</span><span class="n">expected_payoffs</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="k">for</span> <span class="n">eq</span> <span class="ow">in</span> <span class="n">eqs_jl</span><span class="p">],</span>
+        <span class="n">supports</span><span class="o">=</span><span class="p">[</span><span class="n">_to_py_supports</span><span class="p">(</span><span class="n">eq</span><span class="o">.</span><span class="n">supports</span><span class="p">)</span> <span class="k">for</span> <span class="n">eq</span> <span class="ow">in</span> <span class="n">eqs_jl</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">NEs</span><span class="p">,</span> <span class="n">res</span></div>
+
 </pre></div>
 
             <div class="clearer"></div>
@@ -644,7 +897,7 @@
     </div>
     <div class="footer" role="contentinfo">
     &#169; Copyright 2025-2026, QuantEcon.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
     </div>
   </body>
 </html>
