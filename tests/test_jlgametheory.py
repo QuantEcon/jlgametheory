@@ -3,7 +3,8 @@ import numpy as np
 from numpy.testing import assert_, assert_raises
 from quantecon.game_theory import NormalFormGame
 from jlgametheory import (
-    lrsnash, support_enumeration, hc_solve, ipa_solve, gnm_solve
+    lrsnash, support_enumeration, hc_solve, ipa_solve, gnm_solve, nash_cp,
+    nash_se
 )
 
 
@@ -438,10 +439,221 @@ class TestGNMSolve:
         assert_(np.array_equal(res.ray, ray_used))
 
 
+def _expected_payoffs(g, action_profile):
+    N = g.N
+    expected_payoffs = np.empty(N)
+    for i, player in enumerate(g.players):
+        if N == 2:
+            opponents_actions = action_profile[1-i]
+        else:
+            opponents_actions = \
+                tuple(action_profile[(i + j) % N] for j in range(1, N))
+        expected_payoffs[i] = \
+            action_profile[i] @ player.payoff_vector(opponents_actions)
+    return expected_payoffs
+
+
+class TestNashCP:
+    def setup_method(self):
+        self.game_dicts = _gametracer_game_dicts()
+
+    def test_nash_cp(self):
+        for d in self.game_dicts:
+            NE = nash_cp(d['g'])
+            assert_(d['g'].is_nash(NE, tol=1e-5))
+
+    def test_init(self):
+        g = self.game_dicts[1]['g']
+        inits = [([1, 0], [1, 0], [1, 0]),
+                 ([0, 1], [0, 1], [1, 0]),
+                 ([0, 1], [1/3, 2/3], [1/3, 2/3])]
+        NEs = []
+        for init in inits:
+            NE = nash_cp(g, init=init)
+            assert_(g.is_nash(NE, tol=1e-5))
+            NEs.append(NE)
+        # Different initial points lead to different equilibria
+        assert_(not compare_act_profs(np.allclose, NEs[0], NEs[1],
+                                      atol=1e-5))
+
+    def test_full_output(self):
+        for d in self.game_dicts:
+            g = d['g']
+            NE, res = nash_cp(g, full_output=True)
+            assert_(compare_act_profs(np.array_equal, NE, res.NE))
+            assert_(res.status == 'LOCALLY_SOLVED')
+            assert_(np.allclose(res.expected_payoffs,
+                                _expected_payoffs(g, NE), atol=1e-5))
+
+    def test_no_solution(self):
+        # Matching pennies has no pure-action equilibrium
+        g = NormalFormGame([[(1, -1), (-1, 1)], [(-1, 1), (1, -1)]])
+        NE, res = nash_cp(g, allow_mixed=False, full_output=True)
+        assert_(NE is None)
+        assert_(res.NE is None)
+        assert_(res.status == 'LOCALLY_INFEASIBLE')
+        assert_(res.expected_payoffs.shape == (0,))
+
+        NE = nash_cp(g)
+        assert_(compare_act_profs(np.allclose, NE, ([1/2, 1/2], [1/2, 1/2]),
+                                  atol=1e-5))
+
+    def test_options(self):
+        g = self.game_dicts[0]['g']
+        for options in [dict(ϵ=1e-8), dict(verbosity='NONE'),
+                        dict(domrem_strict=False, domrem_mixedactions=False,
+                             domrem_tol=1e-8, domrem_solver='GLPK')]:
+            NE = nash_cp(g, **options)
+            assert_(g.is_nash(NE, tol=1e-5))
+
+    def test_invalid_verbosity(self):
+        g = self.game_dicts[0]['g']
+        assert_raises(ValueError, nash_cp, g, verbosity='loud')
+
+    def test_invalid_init(self):
+        g = self.game_dicts[1]['g']
+        assert_raises(ValueError, nash_cp, g, init=([1, 0], [1, 0]))
+        assert_raises(ValueError, nash_cp, g,
+                      init=([1, 0, 0], [1, 0], [1, 0]))
+
+    def test_keyword_only(self):
+        g = self.game_dicts[1]['g']
+        assert_raises(TypeError, nash_cp, g, ([1, 0], [1, 0], [1, 0]))
+
+    def test_init_immutable(self):
+        g = self.game_dicts[1]['g']
+        init = [np.array([1., 0.]) for i in range(3)]
+        nash_cp(g, init=init)
+        for x in init:
+            assert_(np.array_equal(x, [1., 0.]))
+
+
+class TestNashSE:
+    def setup_method(self):
+        self.game_dicts = _gametracer_game_dicts()
+        # From von Stengel 2007 in Algorithmic Game Theory
+        self.game_dicts[0]['NEs'] = [([1, 0, 0], [1, 0]),
+                                     ([4/5, 1/5, 0], [2/3, 1/3]),
+                                     ([0, 1/3, 2/3], [1/3, 2/3])]
+        # 2x2x2 game from McKelvey and McLennan: 9 equilibria on 8
+        # support profiles (two of them on the full support profile)
+        self.game_dicts[1]['NEs'] = _three_player_game_dicts()[0]['NEs']
+
+    def test_nash_se(self):
+        for d in self.game_dicts:
+            NEs = nash_se(d['g'])
+            assert_(len(NEs) == 1)
+            assert_(d['g'].is_nash(NEs[0], tol=1e-5))
+
+    def test_all(self):
+        d = self.game_dicts[0]
+        NEs = nash_se(d['g'], max_samples=float('inf'))
+        assert_(compare_lists_act_profs(
+            np.allclose, NEs, d['NEs'], atol=1e-8
+        )
+        )
+
+        d = self.game_dicts[1]
+        NEs, res = nash_se(d['g'], max_samples=float('inf'),
+                           full_output=True)
+        assert_(len(NEs) == 8)
+        assert_(len(set(
+            tuple(tuple(s) for s in supports) for supports in res.supports
+        )) == 8)  # One equilibrium per support profile
+        for NE in NEs:
+            assert_(any(compare_act_profs(np.allclose, NE, NE_true,
+                                          atol=1e-5)
+                        for NE_true in d['NEs']))
+
+    def test_max_samples(self):
+        g = self.game_dicts[1]['g']
+        for max_samples in [1, 2, 3]:
+            NEs = nash_se(g, max_samples=max_samples)
+            assert_(len(NEs) == max_samples)
+            for NE in NEs:
+                assert_(g.is_nash(NE, tol=1e-5))
+
+    def test_full_output(self):
+        for d in self.game_dicts:
+            g = d['g']
+            NEs, res = nash_se(g, max_samples=float('inf'), full_output=True)
+            assert_(compare_lists_act_profs(np.array_equal, NEs, res.NEs))
+            assert_(len(res.expected_payoffs) == len(NEs))
+            assert_(len(res.supports) == len(NEs))
+            for NE, expected_payoffs, supports in zip(NEs,
+                                                      res.expected_payoffs,
+                                                      res.supports):
+                assert_(np.allclose(expected_payoffs,
+                                    _expected_payoffs(g, NE), atol=1e-5))
+                for x, support in zip(NE, supports):
+                    assert_(np.array_equal(np.flatnonzero(x > 1e-5),
+                                           support))
+
+    def test_isolated_eq_only(self):
+        # Degenerate game with 3 extreme equilibria
+        bimatrix = [[(3, 3), (3, 3)],
+                    [(2, 2), (5, 6)],
+                    [(0, 3), (6, 1)]]
+        g = NormalFormGame(bimatrix)
+        NEs_true = [([1, 0, 0], [1, 0]),
+                    ([1, 0, 0], [2/3, 1/3]),
+                    ([0, 1/3, 2/3], [1/3, 2/3])]
+
+        # Only support profiles of equal sizes are enumerated
+        NEs, res = nash_se(g, max_samples=float('inf'), full_output=True)
+        assert_(all(len(s[0]) == len(s[1]) for s in res.supports))
+        for NE in NEs:
+            assert_(any(compare_act_profs(np.allclose, NE, NE_true,
+                                          atol=1e-8)
+                        for NE_true in NEs_true))
+
+        # All support profiles are enumerated; an equilibrium may be
+        # found on more than one support profile
+        NEs, res = nash_se(g, max_samples=float('inf'),
+                           isolated_eq_only=False, full_output=True)
+        assert_(any(len(s[0]) != len(s[1]) for s in res.supports))
+        for NE in NEs:
+            assert_(any(compare_act_profs(np.allclose, NE, NE_true,
+                                          atol=1e-8)
+                        for NE_true in NEs_true))
+        for NE_true in NEs_true:
+            assert_(any(compare_act_profs(np.allclose, NE, NE_true,
+                                          atol=1e-8)
+                        for NE in NEs))
+
+    def test_allow_mixed(self):
+        d = self.game_dicts[0]
+        NEs = nash_se(d['g'], max_samples=float('inf'), allow_mixed=False)
+        assert_(compare_lists_act_profs(
+            np.allclose, NEs, d['NEs'][:1], atol=1e-8
+        )
+        )
+
+    def test_mt(self):
+        g = self.game_dicts[1]['g']
+        NEs_mt = nash_se(g, max_samples=float('inf'), mt=True)
+        NEs_st = nash_se(g, max_samples=float('inf'), mt=False)
+        assert_(compare_lists_act_profs(np.allclose, NEs_mt, NEs_st,
+                                        atol=1e-8))
+
+    def test_options(self):
+        g = self.game_dicts[0]['g']
+        for options in [dict(verbosity='NONE'),
+                        dict(domrem_strict=False, domrem_mixedactions=False,
+                             domrem_tol=1e-8, domrem_solver='GLPK')]:
+            NEs = nash_se(g, **options)
+            assert_(len(NEs) == 1)
+            assert_(g.is_nash(NEs[0], tol=1e-5))
+
+    def test_keyword_only(self):
+        g = self.game_dicts[0]['g']
+        assert_raises(TypeError, nash_se, g, 2)
+
+
 def test_invalid_1player_g():
     g = NormalFormGame([[1], [2], [3]])
     for func in [lrsnash, support_enumeration, hc_solve, ipa_solve,
-                 gnm_solve]:
+                 gnm_solve, nash_cp, nash_se]:
         assert_raises(NotImplementedError, func, g)
 
 
@@ -450,5 +662,5 @@ def test_invalid_input():
                 [(2, 2), (5, 6)],
                 [(0, 3), (6, 1)]]
     for func in [lrsnash, support_enumeration, hc_solve, ipa_solve,
-                 gnm_solve]:
+                 gnm_solve, nash_cp, nash_se]:
         assert_raises(TypeError, func, bimatrix)

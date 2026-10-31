@@ -8,6 +8,10 @@
         "GameTracer": {
             "uuid": "8cb375ce-8ac0-445a-ba91-c464b2953507",
             "version": "0.3 - 0"
+        },
+        "StrategicGames": {
+            "uuid": "21c4ae29-9918-4bcb-9542-b100d366d64c",
+            "version": "0.0.8 - 0"
         }
     }
 }

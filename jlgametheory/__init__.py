@@ -9,9 +9,12 @@ jl.seval("using GameTheory")
 GameTheory = jl.GameTheory
 jl.seval("using GameTracer")
 GameTracer = jl.GameTracer
+jl.seval("using StrategicGames")
+StrategicGames = jl.StrategicGames
 
 from .jlgametheory import (
-    lrsnash, support_enumeration, hc_solve, ipa_solve, gnm_solve
+    lrsnash, support_enumeration, hc_solve, ipa_solve, gnm_solve,
+    nash_cp, nash_se
 )
 
 try:
@@ -20,5 +23,6 @@ except PackageNotFoundError:  # pragma: no cover
     __version__ = "0+unknown"
 
 __all__ = [
-    "lrsnash", "support_enumeration", "hc_solve", "ipa_solve", "gnm_solve"
+    "lrsnash", "support_enumeration", "hc_solve", "ipa_solve", "gnm_solve",
+    "nash_cp", "nash_se"
 ]

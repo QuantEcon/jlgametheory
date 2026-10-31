@@ -40,6 +40,12 @@ conda install -c conda-forge jlgametheory
 * [`gnm_solve`](https://quantecon.github.io/jlgametheory/stable/_autosummary/jlgametheory.gnm_solve.html):
   Compute mixed-action Nash equilibria of an N-player normal form game
   with the global Newton method (GNM) algorithm.
+* [`nash_cp`](https://quantecon.github.io/jlgametheory/stable/_autosummary/jlgametheory.nash_cp.html):
+  Compute one mixed-action Nash equilibrium of an N-player normal form game
+  by solving the complementarity problem formulation as a nonlinear program.
+* [`nash_se`](https://quantecon.github.io/jlgametheory/stable/_autosummary/jlgametheory.nash_se.html):
+  Compute mixed-action Nash equilibria of an N-player normal form game by support enumeration,
+  solving the indifference conditions on each support profile with linear or nonlinear programming.
 
 ## Example usage
 
