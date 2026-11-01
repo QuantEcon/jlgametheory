@@ -26,3 +26,5 @@ Implemented functions
    ~jlgametheory.hc_solve
    ~jlgametheory.ipa_solve
    ~jlgametheory.gnm_solve
+   ~jlgametheory.nash_cp
+   ~jlgametheory.nash_se

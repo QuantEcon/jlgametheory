@@ -1,0 +1,6 @@
+﻿nash_se
+=======
+
+.. currentmodule:: jlgametheory
+
+.. autofunction:: jlgametheory.nash_se
